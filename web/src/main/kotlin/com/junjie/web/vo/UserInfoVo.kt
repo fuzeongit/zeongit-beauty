@@ -13,11 +13,11 @@ class UserInfoVo(info: UserInfo) {
 
     var birthday: Date = Date()
 
-    lateinit var name: String
+    lateinit var nickname: String
 
     lateinit var introduction: String
 
-    var head: String? = null
+    var avatarUrl: String? = null
 
     var background: String? = null
 

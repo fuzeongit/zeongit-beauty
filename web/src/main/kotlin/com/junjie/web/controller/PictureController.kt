@@ -93,6 +93,15 @@ class PictureController(private val pictureService: PictureService,
     }
 
     /**
+     * 根据标签获取
+     */
+    @GetMapping("synchronizationIndexPicture")
+    @RestfulPack
+    fun synchronizationIndexPicture(): Long {
+        return pictureService.synchronizationIndexPicture()
+    }
+
+    /**
      * 获取推荐
      */
     @GetMapping("pagingByRecommend")
