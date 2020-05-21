@@ -36,7 +36,11 @@
         </dependency>
         <dependency>
             <groupId>com.junjie</groupId>
-            <artifactId>account</artifactId>
+            <artifactId>data</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.junjie</groupId>
+            <artifactId>share</artifactId>
         </dependency>
     </dependencies>
 

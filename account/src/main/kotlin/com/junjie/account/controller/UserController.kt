@@ -1,17 +1,18 @@
 package com.junjie.account.controller
 
-import com.junjie.account.component.AccountConfig
-import com.junjie.account.dto.SendCodeDto
-import com.junjie.account.dto.UserDto
-import com.junjie.account.dto.UpdateDto
-import com.junjie.account.service.UserService
+
 import com.junjie.core.annotations.Auth
 import com.junjie.core.annotations.RestfulPack
 import com.junjie.core.exception.PermissionException
 import com.junjie.core.exception.ProgramException
 import com.junjie.core.model.Result
 import com.junjie.core.util.JwtUtil
-import com.junjie.data.constant.VerificationCodeOperation
+import com.junjie.share.component.AccountConfig
+import com.junjie.share.constant.VerificationCodeOperation
+import com.junjie.share.dto.SendCodeDto
+import com.junjie.share.dto.UpdateDto
+import com.junjie.share.dto.UserDto
+import com.junjie.share.service.UserService
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -25,7 +26,7 @@ import javax.servlet.http.HttpServletResponse
 @RequestMapping("user")
 class UserController(private val accountConfig: AccountConfig,
                      private val redisTemplate: StringRedisTemplate,
-                     private val accountService: UserService) {
+                     private val userService: UserService) {
 
     /**
      * 发送验证码
@@ -40,13 +41,13 @@ class UserController(private val accountConfig: AccountConfig,
         val phone = dto.phone
         return when (dto.verificationCodeOperation) {
             VerificationCodeOperation.REGISTER -> {
-                accountService.existsByPhone(phone) && throw ProgramException("手机号码已存在")
+                userService.existsByPhone(phone) && throw ProgramException("手机号码已存在")
 //                smsComponent.sendVerificationCode(phone, verificationCode)
                 redisTemplate.opsForValue().set(String.format(accountConfig.registerVerificationCodePrefix, phone), verificationCode, accountConfig.verificationCodeTimeout, TimeUnit.MILLISECONDS)
                 Result(200, null, verificationCode)
             }
             VerificationCodeOperation.FORGET -> {
-                !accountService.existsByPhone(phone) && throw ProgramException("手机号码不存在")
+                !userService.existsByPhone(phone) && throw ProgramException("手机号码不存在")
 //                smsComponent.sendVerificationCode(phone, verificationCode)
                 redisTemplate.opsForValue().set(String.format(accountConfig.forgetVerificationCodePrefix, phone), verificationCode, accountConfig.verificationCodeTimeout, TimeUnit.MILLISECONDS)
                 Result(200, null, verificationCode)
@@ -68,7 +69,7 @@ class UserController(private val accountConfig: AccountConfig,
         dto.verificationCode != redisCode && throw ProgramException("验证码无效")
         //获取系统时间
         val nowMillis = System.currentTimeMillis()
-        val user = accountService.signUp(phone, dto.password!!)
+        val user = userService.signUp(phone, dto.password!!)
         //清理验证码
         redisTemplate.delete(String.format(accountConfig.registerVerificationCodePrefix, phone))
         //把修改密码时间放到redis
@@ -84,7 +85,7 @@ class UserController(private val accountConfig: AccountConfig,
     @PostMapping("/signIn")
     @RestfulPack
     fun signIn(@RequestBody dto: UserDto, response: HttpServletResponse): Boolean {
-        val user = accountService.signIn(dto.phone!!, dto.password!!)
+        val user = userService.signIn(dto.phone!!, dto.password!!)
         response.setHeader("token", generateToken(user.id?.toString()!!, System.currentTimeMillis()))
         return true
     }
@@ -98,7 +99,7 @@ class UserController(private val accountConfig: AccountConfig,
         val phone = dto.phone!!
         val redisCode = redisTemplate.opsForValue()[String.format(accountConfig.forgetVerificationCodePrefix, phone)]
         dto.verificationCode != redisCode && throw PermissionException("验证码无效")
-        accountService.forgot(phone, dto.password!!)
+        userService.forgot(phone, dto.password!!)
         return true
     }
 

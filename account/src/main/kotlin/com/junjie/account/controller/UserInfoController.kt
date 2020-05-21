@@ -1,15 +1,14 @@
 package com.junjie.account.controller
 
-import com.junjie.account.dto.UserInfoDto
-import com.junjie.account.service.UserInfoService
+
 import com.junjie.core.annotations.Auth
 import com.junjie.core.annotations.CurrentUserId
 import com.junjie.core.annotations.CurrentUserInfoId
 import com.junjie.core.annotations.RestfulPack
 import com.junjie.core.exception.NotFoundException
-import com.junjie.data.constant.Gender
-import com.junjie.data.database.account.entity.User
-import com.junjie.data.database.account.entity.UserInfo
+import com.junjie.share.database.account.entity.UserInfo
+import com.junjie.share.dto.UserInfoDto
+import com.junjie.share.service.UserInfoService
 import org.springframework.web.bind.annotation.*
 
 
