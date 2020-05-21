@@ -28,10 +28,6 @@
         </dependency>
         <dependency>
             <groupId>com.junjie</groupId>
-            <artifactId>core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.junjie</groupId>
             <artifactId>share</artifactId>
         </dependency>
     </dependencies>

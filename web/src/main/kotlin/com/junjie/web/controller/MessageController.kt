@@ -1,6 +1,5 @@
 package com.junjie.web.controller
 
-import com.junjie.account.service.UserInfoService
 import com.junjie.core.annotations.Auth
 import com.junjie.core.annotations.CurrentUserInfoId
 import com.junjie.core.annotations.RestfulPack
@@ -9,6 +8,7 @@ import com.junjie.data.database.primary.entity.CommentMessage
 import com.junjie.data.database.primary.entity.FollowMessage
 import com.junjie.data.database.primary.entity.MessageSettings
 import com.junjie.data.database.primary.entity.ReplyMessage
+import com.junjie.share.service.UserInfoService
 import com.junjie.web.service.*
 import com.junjie.web.core.communal.UserVoAbstract
 import com.junjie.web.vo.CommentMessageVo

@@ -1,8 +1,8 @@
 package com.junjie.web.vo
 
 import com.junjie.data.constant.FollowState
-import com.junjie.data.constant.Gender
-import com.junjie.data.database.account.entity.UserInfo
+import com.junjie.share.constant.Gender
+import com.junjie.share.database.account.entity.UserInfo
 import org.springframework.beans.BeanUtils
 import java.util.*
 

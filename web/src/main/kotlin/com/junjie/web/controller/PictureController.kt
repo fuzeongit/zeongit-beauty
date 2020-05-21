@@ -1,6 +1,5 @@
 package com.junjie.web.controller
 
-import com.junjie.account.service.UserInfoService
 import com.junjie.core.annotations.Auth
 import com.junjie.core.annotations.CurrentUserInfoId
 import com.junjie.core.annotations.RestfulPack
@@ -12,6 +11,7 @@ import com.junjie.data.database.primary.entity.Tag
 import com.junjie.data.index.primary.document.PictureDocument
 import com.junjie.qiniu.core.component.QiniuConfig
 import com.junjie.qiniu.service.BucketService
+import com.junjie.share.service.UserInfoService
 import com.junjie.web.core.communal.PictureVoAbstract
 import com.junjie.web.service.CollectionService
 import com.junjie.web.service.FollowService

@@ -22,12 +22,12 @@ import javax.sql.DataSource
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings
 
 
-//@Configuration
-//@EnableTransactionManagement
-//@EnableJpaRepositories(
-//        entityManagerFactoryRef = "entityManagerFactoryPrimary",
-//        transactionManagerRef = "transactionManagerPrimary",
-//        basePackages = ["com.junjie.share.database.account.dao"]) //设置Repository所在位置
+@Configuration
+@EnableTransactionManagement
+@EnableJpaRepositories(
+        entityManagerFactoryRef = "entityManagerFactoryPrimary",
+        transactionManagerRef = "transactionManagerPrimary",
+        basePackages = ["com.junjie.share.database.account.dao"]) //设置Repository所在位置
 class PrimaryDataSourceConfigurer(private val jpaProperties: JpaProperties) {
     @Bean
     @Primary

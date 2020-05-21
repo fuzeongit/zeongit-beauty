@@ -27,12 +27,12 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings
 @EnableJpaRepositories(
         entityManagerFactoryRef = "entityManagerFactoryPrimary",
         transactionManagerRef = "transactionManagerPrimary",
-        basePackages = ["com.junjie.data.database.primary.dao"]) //设置Repository所在位置
+        basePackages = ["com.junjie.share.database.account.dao"]) //设置Repository所在位置
 class PrimaryDataSourceConfigurer(private val jpaProperties: JpaProperties) {
     @Bean
     @Primary
     @Qualifier("primaryDataSource")
-    @ConfigurationProperties(prefix = "spring.datasource.primary")
+    @ConfigurationProperties(prefix = "spring.datasource.account")
     fun primaryDataSource(): DataSource {
         return DataSourceBuilder.create().build()
     }
@@ -51,7 +51,7 @@ class PrimaryDataSourceConfigurer(private val jpaProperties: JpaProperties) {
         return builder
                 .dataSource(primaryDataSource())
                 .properties(properties)
-                .packages("com.junjie.data.database.primary.entity") //设置实体类所在位置
+                .packages("com.junjie.share.database.account.entity") //设置实体类所在位置
                 .persistenceUnit("primaryPersistenceUnit")
                 .build()
     }

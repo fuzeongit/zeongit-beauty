@@ -1,6 +1,5 @@
 package com.junjie.web.controller
 
-import com.junjie.account.service.UserInfoService
 import com.junjie.core.annotations.Auth
 import com.junjie.core.annotations.CurrentUserInfoId
 import com.junjie.core.annotations.RestfulPack
@@ -8,6 +7,7 @@ import com.junjie.core.exception.ProgramException
 import com.junjie.core.exception.SignInException
 import com.junjie.data.constant.FollowState
 import com.junjie.data.database.primary.entity.FollowMessage
+import com.junjie.share.service.UserInfoService
 import com.junjie.web.service.FollowMessageService
 import com.junjie.web.service.FollowService
 import com.junjie.web.core.communal.UserVoAbstract

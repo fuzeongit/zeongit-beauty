@@ -1,8 +1,9 @@
 package com.junjie.web.core.communal
 
 
-import com.junjie.account.service.UserInfoService
-import com.junjie.data.database.account.entity.UserInfo
+
+import com.junjie.share.database.account.entity.UserInfo
+import com.junjie.share.service.UserInfoService
 import com.junjie.web.service.FollowService
 import com.junjie.web.vo.UserInfoVo
 

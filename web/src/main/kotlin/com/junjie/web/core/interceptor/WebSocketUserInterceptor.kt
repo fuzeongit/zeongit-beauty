@@ -1,12 +1,12 @@
 package com.junjie.web.core.interceptor
 
-import com.junjie.account.component.AccountConfig
-import com.junjie.account.service.UserInfoService
-import com.junjie.account.service.UserService
 import com.junjie.core.component.BaseConfig
 import com.junjie.core.exception.SignInException
 import com.junjie.core.util.DateUtil
 import com.junjie.core.util.JwtUtil
+import com.junjie.share.component.AccountConfig
+import com.junjie.share.service.UserInfoService
+import com.junjie.share.service.UserService
 import com.junjie.web.model.WebSocketUser
 import org.springframework.messaging.Message
 import org.springframework.messaging.MessageChannel

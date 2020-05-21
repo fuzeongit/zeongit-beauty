@@ -1,4 +1,4 @@
-package com.junjie.account.controller
+package com.junjie
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
@@ -8,14 +8,12 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker
 import springfox.documentation.swagger2.annotations.EnableSwagger2
 
 
 @EnableJpaAuditing
 @EnableCaching
 @EnableAsync
-@EnableWebSocketMessageBroker
 @EnableSwagger2
 @EnableScheduling
 @SpringBootApplication

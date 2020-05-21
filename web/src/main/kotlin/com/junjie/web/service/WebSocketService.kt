@@ -1,8 +1,7 @@
 package com.junjie.web.service
 
-import com.junjie.account.service.UserInfoService
 import com.junjie.core.model.Result
-import com.junjie.web.service.*
+import com.junjie.share.service.UserInfoService
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service

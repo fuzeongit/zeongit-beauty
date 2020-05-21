@@ -82,7 +82,6 @@ class ProgramConfigurer(
         return CurrentUserInfoIdMethodArgumentResolver()
     }
 
-
     @Bean
     fun dateConvert(): Converter<String, Date> {
         val formatStringList = arrayOf("yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH", "yyyy-MM-dd", "yyyy-MM", "yyyy")

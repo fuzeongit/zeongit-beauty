@@ -1,10 +1,11 @@
 package com.junjie.web.core.configurer
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.junjie.account.component.AccountConfig
-import com.junjie.account.service.UserInfoService
-import com.junjie.account.service.UserService
+
 import com.junjie.core.component.BaseConfig
+import com.junjie.share.component.AccountConfig
+import com.junjie.share.service.UserInfoService
+import com.junjie.share.service.UserService
 import com.junjie.web.core.interceptor.WebSocketUserInterceptor
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
