@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class IntFootprintServiceImpl(private val footprintDAO: FootprintDAO) : FootprintService {
+class FootprintServiceImpl(private val footprintDAO: FootprintDAO) : FootprintService {
     override fun get(userId: Int, pictureId: Int): Footprint {
         return footprintDAO.getFirstByCreatedByAndPictureId(userId, pictureId).orElseThrow { NotFoundException("找不到足迹") }
     }
