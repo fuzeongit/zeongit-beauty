@@ -3,9 +3,6 @@ package com.junjie.web.serviceimpl
 import com.junjie.data.database.primary.dao.CommentDAO
 import com.junjie.data.database.primary.entity.Comment
 import com.junjie.web.service.CommentService
-import org.springframework.cache.annotation.CacheEvict
-import org.springframework.cache.annotation.Cacheable
-import org.springframework.cache.annotation.Caching
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -14,15 +11,10 @@ import org.springframework.stereotype.Service
 
 @Service
 class CommentServiceImpl(private val commentDAO: CommentDAO) : CommentService {
-    @Caching(evict = [
-        CacheEvict("comment::count", key = "#comment.pictureId"),
-        CacheEvict("comment::listTop4", key = "#comment.pictureId")
-    ])
     override fun save(comment: Comment): Comment {
         return commentDAO.save(comment)
     }
 
-    @Cacheable("comment::count", key = "#pictureId")
     override fun count(pictureId: Int): Long {
         return commentDAO.countByPictureId(pictureId)
     }
@@ -31,7 +23,6 @@ class CommentServiceImpl(private val commentDAO: CommentDAO) : CommentService {
         return commentDAO.findAllByPictureIdOrderByCreateDateDesc(pictureId)
     }
 
-    @Cacheable("comment::listTop4", key = "#pictureId")
     override fun listTop4(pictureId: Int): List<Comment> {
         return commentDAO.findAllByPictureId(pictureId, PageRequest.of(0, 4, Sort(Sort.Direction.DESC, "createDate"))).content
     }

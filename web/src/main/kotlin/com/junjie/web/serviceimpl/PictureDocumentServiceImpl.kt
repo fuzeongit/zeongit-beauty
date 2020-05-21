@@ -6,14 +6,11 @@ import com.junjie.data.constant.PrivacyState
 import com.junjie.data.index.primary.dao.PictureDocumentDAO
 import com.junjie.data.index.primary.document.PictureDocument
 import com.junjie.web.service.CollectionService
-import com.junjie.web.service.PictureDocumentService
 import com.junjie.web.service.FootprintService
+import com.junjie.web.service.PictureDocumentService
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.search.aggregations.AggregationBuilders
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms
-import org.springframework.cache.annotation.CacheEvict
-import org.springframework.cache.annotation.CachePut
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -29,12 +26,10 @@ class PictureDocumentServiceImpl(private val pictureDocumentDAO: PictureDocument
                                  private val elasticsearchTemplate: ElasticsearchTemplate,
                                  private val collectionService: CollectionService,
                                  private val footprintService: FootprintService) : PictureDocumentService {
-    @Cacheable("pictureDocument::get", key = "#id")
     override fun get(id: Int): PictureDocument {
         return pictureDocumentDAO.findById(id).orElseThrow { NotFoundException("图片不存在") }
     }
 
-    @CacheEvict("pictureDocument::get", key = "#id")
     override fun remove(id: Int): Boolean {
         try {
             pictureDocumentDAO.deleteById(id)
@@ -44,7 +39,6 @@ class PictureDocumentServiceImpl(private val pictureDocumentDAO: PictureDocument
         }
     }
 
-    @Cacheable("pictureDocument::paging")
     override fun paging(pageable: Pageable, tagList: List<String>?, precise: Boolean, name: String?, startDate: Date?, endDate: Date?, userId: Int?, self: Boolean): Page<PictureDocument> {
         val mustQuery = QueryBuilders.boolQuery()
         if (tagList != null && tagList.isNotEmpty()) {
@@ -89,7 +83,6 @@ class PictureDocumentServiceImpl(private val pictureDocumentDAO: PictureDocument
         return paging(pageable, tagList, false, null, startDate, endDate, null, false)
     }
 
-    @Cacheable("pictureDocument::countByTag", key = "#tag")
     override fun countByTag(tag: String): Long {
         val queryBuilder = QueryBuilders
                 .boolQuery()
@@ -100,7 +93,6 @@ class PictureDocumentServiceImpl(private val pictureDocumentDAO: PictureDocument
         return elasticsearchTemplate.count(searchQuery, PictureDocument::class.java)
     }
 
-    @Cacheable("pictureDocument::getFirstByTag", key = "#tag")
     override fun getFirstByTag(tag: String): PictureDocument {
         return paging(
                 PageRequest.of(0, 1, Sort(Sort.Direction.DESC, "likeAmount")),
@@ -109,7 +101,6 @@ class PictureDocumentServiceImpl(private val pictureDocumentDAO: PictureDocument
                 null, false).content.first()
     }
 
-    @Cacheable("pictureDocument::listTagTop30")
     override fun listTagTop30(): List<String> {
         val aggregationBuilders = AggregationBuilders.terms("tagList").field("tagList").size(30).showTermDocCountError(true)
         val query = NativeSearchQueryBuilder()
@@ -123,7 +114,6 @@ class PictureDocumentServiceImpl(private val pictureDocumentDAO: PictureDocument
         } ?: listOf()
     }
 
-    @CachePut("pictureDocument::get", key = "#picture.id")
     override fun save(picture: PictureDocument): PictureDocument {
         val source = pictureDocumentDAO.findById(picture.id).orElse(picture)
         picture.viewAmount = source.viewAmount
@@ -131,13 +121,11 @@ class PictureDocumentServiceImpl(private val pictureDocumentDAO: PictureDocument
         return pictureDocumentDAO.save(picture)
     }
 
-    @CachePut("pictureDocument::get", key = "#picture.id")
     override fun saveViewAmount(picture: PictureDocument, viewAmount: Long): PictureDocument {
         picture.viewAmount = viewAmount
         return pictureDocumentDAO.save(picture)
     }
 
-    @CachePut("pictureDocument::get", key = "#picture.id")
     override fun saveLikeAmount(picture: PictureDocument, likeAmount: Long): PictureDocument {
         picture.likeAmount = likeAmount
         return pictureDocumentDAO.save(picture)

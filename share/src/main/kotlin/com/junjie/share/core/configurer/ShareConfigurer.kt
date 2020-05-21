@@ -1,4 +1,4 @@
-package com.junjie.account.core.configurer
+package com.junjie.share.core.configurer
 
 
 import com.junjie.core.component.BaseConfig
@@ -25,7 +25,7 @@ import java.util.*
  * 程序的配置清单
  */
 @Configuration
-class ProgramConfigurer(
+class ShareConfigurer(
         private val userService: UserService,
         private val userInfoService: UserInfoService
 ) : WebMvcConfigurer {

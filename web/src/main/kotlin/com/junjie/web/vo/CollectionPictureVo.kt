@@ -1,7 +1,7 @@
 package com.junjie.web.vo
 
-import com.junjie.data.constant.PictureLifeState
 import com.junjie.data.constant.CollectState
+import com.junjie.data.constant.PictureLifeState
 import com.junjie.data.constant.PrivacyState
 import com.junjie.data.index.primary.document.PictureDocument
 import java.util.*
