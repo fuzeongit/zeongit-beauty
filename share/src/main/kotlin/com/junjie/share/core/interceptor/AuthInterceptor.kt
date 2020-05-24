@@ -61,14 +61,13 @@ class AuthInterceptor(private val accountConfig: AccountConfig,
 
                 request.setAttribute("user_id", id)
 
-                if (auth != null && !auth.middleware) {
-                    try {
-                        request.setAttribute("user_info_id", userInfoService.getByUserId(id).id!!)
-                    } catch (e: NotFoundException) {
+                try {
+                    request.setAttribute("user_info_id", userInfoService.getByUserId(id).id!!)
+                } catch (e: NotFoundException) {
+                    if (auth != null && !auth.middleware) {
                         throw PermissionException("请完善你的信息", 503)
                     }
                 }
-
             } catch (e: Exception) {
                 if (method.isAnnotationPresent(Auth::class.java)) {
                     throw if (e is SignInException || e is PermissionException) {
