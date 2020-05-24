@@ -5,4 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface MessageSettingsDAO : JpaRepository<MessageSettings, Int>
+interface MessageSettingsDao : JpaRepository<MessageSettings, Int>

@@ -1,13 +1,11 @@
-package com.junjie.web.serviceimpl
+package com.junjie.admin.serviceimpl
 
 import com.junjie.core.exception.NotFoundException
 import com.junjie.core.util.DateUtil
 import com.junjie.data.constant.PrivacyState
 import com.junjie.data.index.primary.dao.PictureDocumentDao
 import com.junjie.data.index.primary.document.PictureDocument
-import com.junjie.web.service.CollectionService
-import com.junjie.web.service.FootprintService
-import com.junjie.web.service.PictureDocumentService
+import com.junjie.admin.service.PictureDocumentService
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.search.aggregations.AggregationBuilders
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms
@@ -23,9 +21,7 @@ import java.util.*
 
 @Service
 class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocumentDao,
-                                 private val elasticsearchTemplate: ElasticsearchTemplate,
-                                 private val collectionService: CollectionService,
-                                 private val footprintService: FootprintService) : PictureDocumentService {
+                                 private val elasticsearchTemplate: ElasticsearchTemplate) : PictureDocumentService {
     override fun get(id: Int): PictureDocument {
         return pictureDocumentDao.findById(id).orElseThrow { NotFoundException("图片不存在") }
     }
@@ -64,24 +60,11 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
             mustQuery.must(QueryBuilders.termQuery("privacy", PrivacyState.PUBLIC.toString()))
         }
         if (userId != null) {
-            mustQuery.must(QueryBuilders.termQuery("createdBy", userId))
+            mustQuery.must(QueryBuilders.termQuery("userId", userId))
         }
         return pictureDocumentDao.search(mustQuery, pageable)
     }
 
-    override fun pagingByRecommend(userId: Int?, pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureDocument> {
-        val tagList = mutableListOf<String>()
-        if (userId != null) {
-            val collectionList = collectionService.pagingByUserId(userId, PageRequest.of(0, 5)).content
-            for (collection in collectionList) {
-                try {
-                    tagList.addAll(get(collection.pictureId).tagList)
-                } catch (e: NotFoundException) {
-                }
-            }
-        }
-        return paging(pageable, tagList, false, null, startDate, endDate, null, false)
-    }
 
     override fun countByTag(tag: String): Long {
         val queryBuilder = QueryBuilders
@@ -133,8 +116,8 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
 
     override fun saveAll(pictureList: List<PictureDocument>): MutableIterable<PictureDocument> {
         return pictureDocumentDao.saveAll(pictureList.map {
-            it.viewAmount = footprintService.countByPictureId(it.id)
-            it.likeAmount = collectionService.countByPictureId(it.id)
+            it.viewAmount = 0
+            it.likeAmount = 0
             it
         })
     }

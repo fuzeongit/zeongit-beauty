@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 
 @Repository
-interface FollowDAO : JpaRepository<Follow, Int> {
+interface FollowDao : JpaRepository<Follow, Int> {
     fun existsByCreatedByAndFollowingId(createdBy: Int, followingId: Int): Boolean
     @Transactional
     fun deleteByCreatedByAndFollowingId(createdBy: Int, followingId: Int)

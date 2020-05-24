@@ -5,7 +5,7 @@ import com.junjie.data.constant.PictureLifeState
 import com.junjie.data.constant.PictureState
 import com.junjie.data.constant.PrivacyState
 import com.junjie.data.constant.SizeType
-import com.junjie.data.database.base.AskEntity
+import com.junjie.core.entity.AskEntity
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.io.Serializable
 import java.util.*

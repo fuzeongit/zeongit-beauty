@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface ReplyDAO : JpaRepository<Reply, Int> {
+interface ReplyDao : JpaRepository<Reply, Int> {
     fun findAllByCommentIdOrderByCreateDateDesc(commentId: Int): List<Reply>
 }

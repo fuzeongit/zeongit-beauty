@@ -1,7 +1,7 @@
 package com.junjie.web.serviceimpl
 
 import com.junjie.core.util.DateUtil
-import com.junjie.data.database.primary.dao.ReplyMessageDAO
+import com.junjie.data.database.primary.dao.ReplyMessageDao
 import com.junjie.data.database.primary.entity.ReplyMessage
 import com.junjie.web.service.ReplyMessageService
 import org.springframework.data.jpa.domain.Specification
@@ -10,21 +10,21 @@ import java.util.*
 import javax.persistence.criteria.Predicate
 
 @Service
-class ReplyMessageServiceImpl(private val replyMessageDAO: ReplyMessageDAO) : ReplyMessageService {
+class ReplyMessageServiceImpl(private val replyMessageDao: ReplyMessageDao) : ReplyMessageService {
     override fun save(replyMessage: ReplyMessage): ReplyMessage {
-        return replyMessageDAO.save(replyMessage)
+        return replyMessageDao.save(replyMessage)
     }
 
     override fun list(criticId: Int): List<ReplyMessage> {
-        return replyMessageDAO.findAllByCriticIdOrderByCreateDateDesc(criticId)
+        return replyMessageDao.findAllByCriticIdOrderByCreateDateDesc(criticId)
     }
 
     override fun countUnread(criticId: Int): Long {
-        return replyMessageDAO.countByCriticIdAndReview(criticId, false)
+        return replyMessageDao.countByCriticIdAndReview(criticId, false)
     }
 
     override fun listUnread(criticId: Int): List<ReplyMessage> {
-        return replyMessageDAO.findAllByCriticIdAndReviewOrderByCreateDateDesc(criticId, false)
+        return replyMessageDao.findAllByCriticIdAndReviewOrderByCreateDateDesc(criticId, false)
     }
 
     override fun deleteByMonthAgo() {
@@ -33,9 +33,9 @@ class ReplyMessageServiceImpl(private val replyMessageDAO: ReplyMessageDAO) : Re
             predicatesList.add(criteriaBuilder.greaterThan(root.get("createDate"), DateUtil.addDate(Date(), 0, -30, 0, 0, 0, 0, 0)))
             criteriaBuilder.and(*predicatesList.toArray(arrayOfNulls<Predicate>(predicatesList.size)))
         }
-        val list = replyMessageDAO.findAll(specification)
+        val list = replyMessageDao.findAll(specification)
         for (item in list) {
-            replyMessageDAO.delete(item)
+            replyMessageDao.delete(item)
         }
         return
     }

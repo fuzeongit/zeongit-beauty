@@ -1,23 +1,23 @@
 server:
-  port: 8081
+  port: 12082
 spring:
   redis:
     host: 127.0.0.1
     port: 6379
   datasource:
-    primary:
+    beauty:
       driver-class-name: com.mysql.jdbc.Driver
-      jdbc-url: jdbc:mysql://127.0.0.1:3306/secdra?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8
+      jdbc-url: jdbc:mysql://127.0.0.1:3306/beauty?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8
       username: root
       password: root
     account:
       driver-class-name: com.mysql.jdbc.Driver
-      jdbc-url: jdbc:mysql://127.0.0.1:3306/secdra_account?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8
+      jdbc-url: jdbc:mysql://127.0.0.1:3306/zeongit_account?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8
       username: root
       password: root
-    collect:
+    admin:
       driver-class-name: com.mysql.jdbc.Driver
-      jdbc-url: jdbc:mysql://127.0.0.1:3306/secdra_collect?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8
+      jdbc-url: jdbc:mysql://127.0.0.1:3306/beauty_admin?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8
       username: root
       password: root
   jpa:
@@ -43,3 +43,10 @@ qiniu:
   qiniuHeadBucketUrl: http://secdrahead.secdra.com
   qiniuBackBucketUrl: http://secdraback.secdra.com
   qiniuBucketUrl: http://secdraimg.secdra.com
+account:
+  registerVerificationCodePrefix: register_verification_code:%s
+  forgetVerificationCodePrefix: forget_verification_code:%s
+  verificationCodeTimeout: 300000
+  jwtExpiresSecond: 5184000000
+  jwtSecretString: www.secdra.com
+  updatePasswordTimePrefix: base:update_password_time:%s

@@ -1,7 +1,7 @@
 package com.junjie.web.serviceimpl
 
 import com.junjie.core.exception.NotFoundException
-import com.junjie.data.database.primary.dao.MessageSettingsDAO
+import com.junjie.data.database.primary.dao.MessageSettingsDao
 import com.junjie.data.database.primary.entity.MessageSettings
 import com.junjie.web.service.MessageSettingsService
 import org.springframework.cache.annotation.CachePut
@@ -10,7 +10,7 @@ import org.springframework.data.domain.ExampleMatcher
 import org.springframework.stereotype.Service
 
 @Service
-class MessageSettingsServiceImpl(private val messageSettingsDAO: MessageSettingsDAO) : MessageSettingsService {
+class MessageSettingsServiceImpl(private val messageSettingsDao: MessageSettingsDao) : MessageSettingsService {
     override fun get(userId: Int): MessageSettings {
         val query = MessageSettings()
         query.createdBy = userId
@@ -26,15 +26,15 @@ class MessageSettingsServiceImpl(private val messageSettingsDAO: MessageSettings
                 .withIgnorePaths("modifiedDate")
         val example = Example.of(query, matcher)
         return try {
-            messageSettingsDAO.findOne(example).orElseThrow { NotFoundException("找不到消息配置") }
+            messageSettingsDao.findOne(example).orElseThrow { NotFoundException("找不到消息配置") }
         } catch (e: NotFoundException) {
             val newSettings = MessageSettings()
-            messageSettingsDAO.save(newSettings)
+            messageSettingsDao.save(newSettings)
         }
     }
 
     @CachePut("message::settings::get", key = "#messageSettings.createdBy")
     override fun save(messageSettings: MessageSettings): MessageSettings {
-        return messageSettingsDAO.save(messageSettings)
+        return messageSettingsDao.save(messageSettings)
     }
 }

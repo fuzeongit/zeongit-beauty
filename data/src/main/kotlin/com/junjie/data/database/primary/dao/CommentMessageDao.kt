@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.stereotype.Repository
 
 @Repository
-interface CommentMessageDAO : JpaRepository<CommentMessage, Int>, JpaSpecificationExecutor<CommentMessage> {
+interface CommentMessageDao : JpaRepository<CommentMessage, Int>, JpaSpecificationExecutor<CommentMessage> {
     fun findAllByAuthorIdOrderByCreateDateDesc(authorId: Int): List<CommentMessage>
 
     fun countByAuthorIdAndReview(authorId: Int, review: Boolean): Long

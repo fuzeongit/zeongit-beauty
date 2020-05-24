@@ -1,4 +1,4 @@
-package com.junjie.web.serviceimpl
+package com.junjie.admin.serviceimpl
 
 import com.junjie.core.exception.NotFoundException
 import com.junjie.core.util.DateUtil
@@ -8,8 +8,8 @@ import com.junjie.data.constant.SizeType
 import com.junjie.data.database.primary.dao.PictureDao
 import com.junjie.data.database.primary.entity.Picture
 import com.junjie.data.index.primary.document.PictureDocument
-import com.junjie.web.service.PictureDocumentService
-import com.junjie.web.service.PictureService
+import com.junjie.admin.service.PictureDocumentService
+import com.junjie.admin.service.PictureService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification

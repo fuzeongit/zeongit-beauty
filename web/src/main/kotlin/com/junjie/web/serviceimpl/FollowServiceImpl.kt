@@ -1,7 +1,7 @@
 package com.junjie.web.serviceimpl
 
 import com.junjie.data.constant.FollowState
-import com.junjie.data.database.primary.dao.FollowDAO
+import com.junjie.data.database.primary.dao.FollowDao
 import com.junjie.data.database.primary.entity.Follow
 import com.junjie.web.service.FollowService
 import org.springframework.data.domain.Page
@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
 @Service
-class FollowServiceImpl(private val followDAO: FollowDAO) : FollowService {
+class FollowServiceImpl(private val followDao: FollowDao) : FollowService {
     override fun exists(followerId: Int?, followingId: Int): FollowState {
         if (followerId == null) {
             return FollowState.CONCERNED
@@ -18,7 +18,7 @@ class FollowServiceImpl(private val followDAO: FollowDAO) : FollowService {
             return FollowState.SElF
         }
         return try {
-            if (followDAO.existsByCreatedByAndFollowingId(followerId, followingId)) FollowState.CONCERNED else FollowState.STRANGE
+            if (followDao.existsByCreatedByAndFollowingId(followerId, followingId)) FollowState.CONCERNED else FollowState.STRANGE
         } catch (e: Exception) {
             FollowState.SElF
         }
@@ -26,12 +26,12 @@ class FollowServiceImpl(private val followDAO: FollowDAO) : FollowService {
 
     override fun save(followingId: Int): Follow {
         val follow = Follow(followingId)
-        return followDAO.save(follow)
+        return followDao.save(follow)
     }
 
     override fun remove(followerId: Int, followingId: Int): Boolean {
         return try {
-            followDAO.deleteByCreatedByAndFollowingId(followerId, followingId)
+            followDao.deleteByCreatedByAndFollowingId(followerId, followingId)
             true
         } catch (e: Exception) {
             throw e
@@ -39,10 +39,10 @@ class FollowServiceImpl(private val followDAO: FollowDAO) : FollowService {
     }
 
     override fun pagingByFollowerId(followerId: Int, pageable: Pageable): Page<Follow> {
-        return followDAO.findAllByCreatedBy(followerId, pageable)
+        return followDao.findAllByCreatedBy(followerId, pageable)
     }
 
     override fun pagingByFollowingId(followingId: Int, pageable: Pageable): Page<Follow> {
-        return followDAO.findAllByFollowingId(followingId, pageable)
+        return followDao.findAllByFollowingId(followingId, pageable)
     }
 }

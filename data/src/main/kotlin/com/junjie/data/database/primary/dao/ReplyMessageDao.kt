@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.stereotype.Repository
 
 @Repository
-interface ReplyMessageDAO : JpaRepository<ReplyMessage, Int>, JpaSpecificationExecutor<ReplyMessage> {
+interface ReplyMessageDao : JpaRepository<ReplyMessage, Int>, JpaSpecificationExecutor<ReplyMessage> {
     fun findAllByCriticIdOrderByCreateDateDesc(criticId: Int): List<ReplyMessage>
 
     fun countByCriticIdAndReview(criticId: Int, review: Boolean): Long

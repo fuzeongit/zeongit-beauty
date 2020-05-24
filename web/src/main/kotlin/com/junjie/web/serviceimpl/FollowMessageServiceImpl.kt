@@ -1,7 +1,7 @@
 package com.junjie.web.serviceimpl
 
 import com.junjie.core.util.DateUtil
-import com.junjie.data.database.primary.dao.FollowMessageDAO
+import com.junjie.data.database.primary.dao.FollowMessageDao
 import com.junjie.data.database.primary.entity.FollowMessage
 import com.junjie.web.service.FollowMessageService
 import org.springframework.data.jpa.domain.Specification
@@ -10,21 +10,21 @@ import java.util.*
 import javax.persistence.criteria.Predicate
 
 @Service
-class FollowMessageServiceImpl(private val followMessageDAO: FollowMessageDAO) : FollowMessageService {
+class FollowMessageServiceImpl(private val followMessageDao: FollowMessageDao) : FollowMessageService {
     override fun save(followMessage: FollowMessage): FollowMessage {
-        return followMessageDAO.save(followMessage)
+        return followMessageDao.save(followMessage)
     }
 
     override fun list(followingId: Int): List<FollowMessage> {
-        return followMessageDAO.findAllByFollowingIdOrderByCreateDateDesc(followingId)
+        return followMessageDao.findAllByFollowingIdOrderByCreateDateDesc(followingId)
     }
 
     override fun countUnread(followingId: Int): Long {
-        return followMessageDAO.countByFollowingIdAndReview(followingId, false)
+        return followMessageDao.countByFollowingIdAndReview(followingId, false)
     }
 
     override fun listUnread(followingId: Int): List<FollowMessage> {
-        return followMessageDAO.findAllByFollowingIdAndReviewOrderByCreateDateDesc(followingId, false)
+        return followMessageDao.findAllByFollowingIdAndReviewOrderByCreateDateDesc(followingId, false)
     }
 
     override fun deleteByMonthAgo() {
@@ -33,9 +33,9 @@ class FollowMessageServiceImpl(private val followMessageDAO: FollowMessageDAO) :
             predicatesList.add(criteriaBuilder.lessThan(root.get("createDate"), DateUtil.addDate(Date(), 0, -30, 0, 0, 0, 0, 0)))
             criteriaBuilder.and(*predicatesList.toArray(arrayOfNulls<Predicate>(predicatesList.size)))
         }
-        val list = followMessageDAO.findAll(specification)
+        val list = followMessageDao.findAll(specification)
         for (item in list) {
-            followMessageDAO.delete(item)
+            followMessageDao.delete(item)
         }
         return
     }

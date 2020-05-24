@@ -1,6 +1,6 @@
 package com.junjie.data.database.primary.entity
 
-import com.junjie.data.database.base.AskEntity
+import com.junjie.core.entity.AskEntity
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.io.Serializable
 import javax.persistence.*

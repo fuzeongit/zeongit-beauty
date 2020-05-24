@@ -6,4 +6,4 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.stereotype.Repository
 
 @Repository
-interface TagDAO : JpaRepository<Tag, Int>, JpaSpecificationExecutor<Tag>
+interface TagDao : JpaRepository<Tag, Int>, JpaSpecificationExecutor<Tag>

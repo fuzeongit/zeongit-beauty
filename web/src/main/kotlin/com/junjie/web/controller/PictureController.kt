@@ -23,7 +23,10 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
+import java.io.File
+import java.io.FileInputStream
 import java.util.*
+import javax.imageio.ImageIO
 
 /**
  * @author fjj
@@ -137,6 +140,9 @@ class PictureController(private val pictureService: PictureService,
     fun countByTag(tag: String): Long {
         return pictureDocumentService.countByTag(tag)
     }
+
+
+
 
     /**
      * 保存图片

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface PictureDAO : JpaRepository<Picture, Int>, JpaSpecificationExecutor<Picture> {
+interface PictureDao : JpaRepository<Picture, Int>, JpaSpecificationExecutor<Picture> {
     @EntityGraph(value = "Picture.Tag", type = EntityGraph.EntityGraphType.FETCH)
     override fun findById(id: Int): Optional<Picture>
 

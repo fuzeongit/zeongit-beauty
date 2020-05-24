@@ -32,12 +32,15 @@
         </dependency>
         <dependency>
             <groupId>com.junjie</groupId>
-            <artifactId>account</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <artifactId>qiniu</artifactId>
         </dependency>
         <dependency>
             <groupId>com.junjie</groupId>
-            <artifactId>qiniu</artifactId>
+            <artifactId>data</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.junjie</groupId>
+            <artifactId>share</artifactId>
         </dependency>
     </dependencies>
 
