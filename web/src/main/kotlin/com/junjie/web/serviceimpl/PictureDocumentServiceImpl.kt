@@ -73,7 +73,7 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
 
         if (userId == null && userBlacklist != null) {
             val userBlacklistBoolQuery = QueryBuilders.boolQuery()
-            for (item in userBlacklist) {
+            for (item in userBlacklist.toSet()) {
                 userBlacklistBoolQuery.mustNot(QueryBuilders.termQuery("createdBy", item))
             }
             mustQuery.must(userBlacklistBoolQuery)
@@ -81,7 +81,7 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
 
         if (pictureBlacklist != null) {
             val pictureBlacklistBoolQuery = QueryBuilders.boolQuery()
-            for (item in pictureBlacklist) {
+            for (item in pictureBlacklist.toSet()) {
                 pictureBlacklistBoolQuery.mustNot(QueryBuilders.termQuery("id", item))
             }
             mustQuery.must(pictureBlacklistBoolQuery)
