@@ -80,7 +80,16 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
                 }
             }
         }
-        return paging(pageable, tagList, false, null, startDate, endDate, null, false)
+        return paging(pageable, tagList, false, null, startDate, endDate)
+    }
+
+    override fun pagingRecommendById(id: Int, pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureDocument> {
+        val tagList = try {
+            get(id).tagList
+        } catch (e: Exception) {
+            listOf<String>()
+        }
+        return paging(pageable, tagList, false, null, startDate, endDate)
     }
 
     override fun countByTag(tag: String): Long {

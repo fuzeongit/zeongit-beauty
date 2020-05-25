@@ -10,9 +10,14 @@ interface PictureDocumentService {
 
     fun remove(id: Int): Boolean
 
-    fun paging(pageable: Pageable, tagList: List<String>?, precise: Boolean, name: String?, startDate: Date?, endDate: Date?, userId: Int?, self: Boolean): Page<PictureDocument>
+    fun paging(pageable: Pageable, tagList: List<String>? = null,
+               precise: Boolean = false, name: String? = null,
+               startDate: Date? = null, endDate: Date? = null,
+               userId: Int? = null, self: Boolean = false): Page<PictureDocument>
 
-    fun pagingByRecommend(userId: Int?, pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureDocument>
+    fun pagingByRecommend(userId: Int?, pageable: Pageable, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
+
+    fun pagingRecommendById(id: Int, pageable: Pageable, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
 
     fun countByTag(tag: String): Long
 

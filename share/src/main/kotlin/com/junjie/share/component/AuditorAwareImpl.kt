@@ -8,10 +8,10 @@ import java.util.*
 
 
 @Component
-class AuditorAwareImpl : AuditorAware<String> {
-    override fun getCurrentAuditor(): Optional<String> {
+class AuditorAwareImpl : AuditorAware<Int> {
+    override fun getCurrentAuditor(): Optional<Int> {
         return Optional.ofNullable(try {
-            (RequestContextHolder.getRequestAttributes() as ServletRequestAttributes?)!!.request.getAttribute("user_info_id") as String
+            (RequestContextHolder.getRequestAttributes() as ServletRequestAttributes?)!!.request.getAttribute("user_info_id") as Int
         } catch (e: Exception) {
             null
         })

@@ -18,7 +18,9 @@ class CurrentUserInfoIdMethodArgumentResolver : HandlerMethodArgumentResolver {
      * 有CurrentAccountId注解的进入解释
      */
     override fun supportsParameter(parameter: MethodParameter): Boolean {
-        return parameter.parameterType.isAssignableFrom(Int::class.java) && parameter.hasParameterAnnotation(CurrentUserInfoId::class.java)
+        val parameterType = parameter.parameterType
+        return (parameterType.isAssignableFrom(Integer::class.java) || parameterType.isAssignableFrom(Int::class.java))
+                && parameter.hasParameterAnnotation(CurrentUserInfoId::class.java)
     }
 
     /**

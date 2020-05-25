@@ -114,6 +114,15 @@ class PictureController(private val pictureService: PictureService,
     }
 
     /**
+     * 按图片获取推荐
+     */
+    @GetMapping("pagingRecommendById")
+    @RestfulPack
+    fun pagingRecommendById(@CurrentUserInfoId userId: Int?, id: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureVo> {
+        return getPageVo(pictureDocumentService.pagingRecommendById(id, pageable, startDate, endDate), userId)
+    }
+
+    /**
      * 获取图片
      */
     @GetMapping("get")
@@ -140,8 +149,6 @@ class PictureController(private val pictureService: PictureService,
     fun countByTag(tag: String): Long {
         return pictureDocumentService.countByTag(tag)
     }
-
-
 
 
     /**
