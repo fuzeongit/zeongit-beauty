@@ -21,7 +21,7 @@ class UserInfoVo(info: UserInfo) {
 
     var background: String? = null
 
-    var focus: FollowState = FollowState.SElF
+    var focus: FollowState = FollowState.STRANGE
 
     var country: String = "中国"
 

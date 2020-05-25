@@ -21,7 +21,7 @@ abstract class PictureVoAbstract : UserVoAbstract() {
         (picture.privacy == PrivacyState.PRIVATE && picture.createdBy != userId) && throw PermissionException("你没有权限查看该图片")
         val userVo = super.getUserVo(picture.createdBy, userId)
         val pictureVo = PictureVo(picture)
-        userId?.let { pictureVo.focus = collectionService.exists(it, pictureVo.id) }
+        pictureVo.focus = collectionService.exists(userId, pictureVo.id)
         pictureVo.user = userVo
         return pictureVo
     }

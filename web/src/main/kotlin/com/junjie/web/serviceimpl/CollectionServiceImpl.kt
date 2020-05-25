@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 class CollectionServiceImpl(private val collectionDao: CollectionDao) : CollectionService {
     override fun exists(userId: Int?, pictureId: Int): CollectState {
         return if (userId == null) {
-            CollectState.CONCERNED
+            CollectState.STRANGE
         } else {
             if (collectionDao.existsByCreatedByAndPictureId(userId, pictureId)) CollectState.CONCERNED else CollectState.STRANGE
         }

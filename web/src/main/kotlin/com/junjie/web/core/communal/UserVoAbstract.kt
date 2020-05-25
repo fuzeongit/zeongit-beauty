@@ -1,7 +1,6 @@
 package com.junjie.web.core.communal
 
 
-
 import com.junjie.share.database.account.entity.UserInfo
 import com.junjie.share.service.UserInfoService
 import com.junjie.web.service.FollowService
