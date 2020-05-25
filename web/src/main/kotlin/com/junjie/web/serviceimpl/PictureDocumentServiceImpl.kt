@@ -116,7 +116,11 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
         } catch (e: Exception) {
             listOf<String>()
         }
-        return paging(pageable, tagList, false, null, startDate, endDate)
+        return paging(pageable = pageable,
+                tagList = tagList,
+                startDate = startDate,
+                endDate = startDate,
+                pictureBlacklist = listOf(id))
     }
 
     override fun countByTag(tag: String): Long {
