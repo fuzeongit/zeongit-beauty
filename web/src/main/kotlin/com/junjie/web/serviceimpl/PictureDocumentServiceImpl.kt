@@ -39,7 +39,11 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
         }
     }
 
-    override fun paging(pageable: Pageable, tagList: List<String>?, precise: Boolean, name: String?, startDate: Date?, endDate: Date?, userId: Int?, self: Boolean): Page<PictureDocument> {
+    override fun paging(pageable: Pageable, tagList: List<String>?,
+                        precise: Boolean, name: String?,
+                        startDate: Date?, endDate: Date?,
+                        userId: Int?, self: Boolean,
+                        userBlacklist: List<Int>?, pictureBlacklist: List<Int>?): Page<PictureDocument> {
         val mustQuery = QueryBuilders.boolQuery()
         if (tagList != null && tagList.isNotEmpty()) {
             val tagBoolQuery = QueryBuilders.boolQuery()
@@ -66,21 +70,44 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
         if (userId != null) {
             mustQuery.must(QueryBuilders.termQuery("createdBy", userId))
         }
+
+        if (userId == null && userBlacklist != null) {
+            val userBlacklistBoolQuery = QueryBuilders.boolQuery()
+            for (item in userBlacklist) {
+                userBlacklistBoolQuery.mustNot(QueryBuilders.termQuery("createdBy", item))
+            }
+            mustQuery.must(userBlacklistBoolQuery)
+        }
+
+        if (pictureBlacklist != null) {
+            val pictureBlacklistBoolQuery = QueryBuilders.boolQuery()
+            for (item in pictureBlacklist) {
+                pictureBlacklistBoolQuery.mustNot(QueryBuilders.termQuery("id", item))
+            }
+            mustQuery.must(pictureBlacklistBoolQuery)
+        }
+
         return pictureDocumentDao.search(mustQuery, pageable)
     }
 
     override fun pagingByRecommend(userId: Int?, pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureDocument> {
         val tagList = mutableListOf<String>()
+        val collectionPictureIdList = mutableListOf<Int>()
         if (userId != null) {
             val collectionList = collectionService.pagingByUserId(userId, PageRequest.of(0, 5)).content
             for (collection in collectionList) {
+                collectionPictureIdList.add(collection.pictureId)
                 try {
                     tagList.addAll(get(collection.pictureId).tagList)
                 } catch (e: NotFoundException) {
                 }
             }
         }
-        return paging(pageable, tagList, false, null, startDate, endDate)
+        return paging(pageable = pageable,
+                tagList = tagList,
+                startDate = startDate,
+                endDate = startDate,
+                pictureBlacklist = collectionPictureIdList)
     }
 
     override fun pagingRecommendById(id: Int, pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureDocument> {

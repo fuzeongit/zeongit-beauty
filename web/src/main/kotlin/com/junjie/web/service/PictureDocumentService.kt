@@ -13,7 +13,9 @@ interface PictureDocumentService {
     fun paging(pageable: Pageable, tagList: List<String>? = null,
                precise: Boolean = false, name: String? = null,
                startDate: Date? = null, endDate: Date? = null,
-               userId: Int? = null, self: Boolean = false): Page<PictureDocument>
+               userId: Int? = null, self: Boolean = false,
+               userBlacklist: List<Int>? = null, pictureBlacklist: List<Int>? = null
+    ): Page<PictureDocument>
 
     fun pagingByRecommend(userId: Int?, pageable: Pageable, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
 
