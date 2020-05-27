@@ -6,7 +6,7 @@ import com.junjie.core.annotations.RestfulPack
 import com.junjie.data.database.primary.entity.Reply
 import com.junjie.data.database.primary.entity.ReplyMessage
 import com.junjie.share.service.UserInfoService
-import com.junjie.web.core.communal.UserVoAbstract
+import com.junjie.web.core.communal.UserInfoVoAbstract
 import com.junjie.web.service.FollowService
 import com.junjie.web.service.ReplyMessageService
 import com.junjie.web.service.ReplyService
@@ -24,7 +24,7 @@ class ReplyController(private val replyService: ReplyService,
                       private val replyMessageService: ReplyMessageService,
                       private val webSocketService: WebSocketService,
                       override val userInfoService: UserInfoService,
-                      override val followService: FollowService) : UserVoAbstract() {
+                      override val followService: FollowService) : UserInfoVoAbstract() {
 
     class SaveDto {
         var commentId: Int = 0

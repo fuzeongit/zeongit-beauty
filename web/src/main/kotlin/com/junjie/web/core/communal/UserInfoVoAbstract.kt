@@ -6,7 +6,7 @@ import com.junjie.share.service.UserInfoService
 import com.junjie.web.service.FollowService
 import com.junjie.web.vo.UserInfoVo
 
-abstract class UserVoAbstract {
+abstract class UserInfoVoAbstract {
     abstract val userInfoService: UserInfoService
     abstract val followService: FollowService
 

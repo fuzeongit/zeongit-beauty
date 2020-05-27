@@ -10,7 +10,7 @@ import com.junjie.data.database.primary.entity.MessageSettings
 import com.junjie.data.database.primary.entity.ReplyMessage
 import com.junjie.share.service.UserInfoService
 import com.junjie.web.service.*
-import com.junjie.web.core.communal.UserVoAbstract
+import com.junjie.web.core.communal.UserInfoVoAbstract
 import com.junjie.web.vo.CommentMessageVo
 import com.junjie.web.vo.FollowMessageVo
 import com.junjie.web.vo.ReplyMessageVo
@@ -23,7 +23,7 @@ class MessageController(private val commentMessageService: CommentMessageService
                         private val followMessageService: FollowMessageService,
                         private val messageSettingsService: MessageSettingsService,
                         override val userInfoService: UserInfoService,
-                        override val followService: FollowService) : UserVoAbstract() {
+                        override val followService: FollowService) : UserInfoVoAbstract() {
 
     class SaveDto {
         var commentStatus: Boolean = true

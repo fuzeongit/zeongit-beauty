@@ -9,7 +9,7 @@ import com.junjie.share.service.UserInfoService
 import com.junjie.web.service.CommentMessageService
 import com.junjie.web.service.CommentService
 import com.junjie.web.service.FollowService
-import com.junjie.web.core.communal.UserVoAbstract
+import com.junjie.web.core.communal.UserInfoVoAbstract
 import com.junjie.web.service.WebSocketService
 import com.junjie.web.vo.CommentVo
 import org.springframework.data.domain.Page
@@ -28,7 +28,7 @@ class CommentController(private val commentService: CommentService,
                         private val commentMessageService: CommentMessageService,
                         private val webSocketService: WebSocketService,
                         override val userInfoService: UserInfoService,
-                        override val followService: FollowService) : UserVoAbstract() {
+                        override val followService: FollowService) : UserInfoVoAbstract() {
 
     class SaveDto {
         var authorId: Int = 0

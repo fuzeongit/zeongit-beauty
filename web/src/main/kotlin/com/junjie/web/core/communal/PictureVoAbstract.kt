@@ -7,7 +7,7 @@ import com.junjie.web.service.CollectionService
 import com.junjie.web.service.PictureDocumentService
 import com.junjie.web.vo.PictureVo
 
-abstract class PictureVoAbstract : UserVoAbstract() {
+abstract class PictureVoAbstract : UserInfoVoAbstract() {
     abstract val pictureDocumentService: PictureDocumentService
 
     abstract val collectionService: CollectionService

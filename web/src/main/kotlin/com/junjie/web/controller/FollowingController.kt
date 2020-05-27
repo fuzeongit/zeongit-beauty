@@ -10,7 +10,7 @@ import com.junjie.data.database.primary.entity.FollowMessage
 import com.junjie.share.service.UserInfoService
 import com.junjie.web.service.FollowMessageService
 import com.junjie.web.service.FollowService
-import com.junjie.web.core.communal.UserVoAbstract
+import com.junjie.web.core.communal.UserInfoVoAbstract
 import com.junjie.web.service.WebSocketService
 import com.junjie.web.vo.UserInfoVo
 import org.springframework.data.domain.Page
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*
 class FollowingController(private val followMessageService: FollowMessageService,
                           private val webSocketService: WebSocketService,
                           override val userInfoService: UserInfoService,
-                          override val followService: FollowService) : UserVoAbstract() {
+                          override val followService: FollowService) : UserInfoVoAbstract() {
 
     class FocusDto {
         var followingId: Int = 0

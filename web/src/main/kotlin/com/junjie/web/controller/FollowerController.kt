@@ -5,7 +5,7 @@ import com.junjie.core.annotations.RestfulPack
 import com.junjie.core.exception.SignInException
 import com.junjie.share.service.UserInfoService
 import com.junjie.web.service.FollowService
-import com.junjie.web.core.communal.UserVoAbstract
+import com.junjie.web.core.communal.UserInfoVoAbstract
 import com.junjie.web.vo.UserInfoVo
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("follower")
-class FollowerController(override val userInfoService: UserInfoService, override val followService: FollowService) : UserVoAbstract() {
+class FollowerController(override val userInfoService: UserInfoService, override val followService: FollowService) : UserInfoVoAbstract() {
     /**
      * 获取粉丝列表
      */
