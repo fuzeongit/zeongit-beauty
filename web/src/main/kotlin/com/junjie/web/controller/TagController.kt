@@ -1,6 +1,8 @@
 package com.junjie.web.controller
 
+import com.junjie.core.annotations.CurrentUserInfoId
 import com.junjie.core.annotations.RestfulPack
+import com.junjie.core.exception.SignInException
 import com.junjie.web.service.PictureDocumentService
 import com.junjie.web.vo.TagPictureVo
 import org.springframework.web.bind.annotation.GetMapping
@@ -28,5 +30,22 @@ class TagController(private val pictureDocumentService: PictureDocumentService) 
             val picture = pictureDocumentService.getFirstByTag(it)
             TagPictureVo(picture.url, it)
         }
+    }
+
+    class UserTagFrequencyVo(var name: String, var amount: Int)
+
+    @GetMapping("listTagFrequencyByUserId")
+    @RestfulPack
+    fun listTagFrequencyByUserId(@CurrentUserInfoId userId: Int?, targetId: Int?): List<UserTagFrequencyVo> {
+        (userId == null && targetId == null) && throw SignInException("请重新登录")
+        val pictureList = pictureDocumentService.listByUserId(targetId ?: userId!!)
+        val tagList = mutableListOf<String>()
+        pictureList.forEach { tagList.addAll(it.tagList) }
+        val tagSet = tagList.toSet().filter { it.isNotEmpty() }
+        return tagSet.map {
+            UserTagFrequencyVo(it,
+                    tagList.filter { source -> source == it }.size
+            )
+        }.sortedByDescending { it.amount }
     }
 }

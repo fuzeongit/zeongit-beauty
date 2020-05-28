@@ -34,4 +34,6 @@ interface PictureDocumentService {
     fun saveLikeAmount(picture: PictureDocument, likeAmount: Long): PictureDocument
 
     fun saveAll(pictureList: List<PictureDocument>): MutableIterable<PictureDocument>
+
+    fun listByUserId(userId: Int): List<PictureDocument>
 }

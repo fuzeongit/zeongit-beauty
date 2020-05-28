@@ -144,7 +144,7 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
     override fun listTagTop30(): List<String> {
         val aggregationBuilders = AggregationBuilders.terms("tagList").field("tagList").size(30).showTermDocCountError(true)
         val query = NativeSearchQueryBuilder()
-                .withIndices("index_picture_search")
+                .withIndices("beauty_picture_search")
                 .addAggregation(aggregationBuilders)
                 .build()
         return elasticsearchTemplate.query(query) {
@@ -177,5 +177,9 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
             it.likeAmount = collectionService.countByPictureId(it.id)
             it
         })
+    }
+
+    override fun listByUserId(userId: Int): List<PictureDocument> {
+       return pictureDocumentDao.findAllByCreatedBy(userId)
     }
 }
