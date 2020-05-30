@@ -86,9 +86,9 @@ class FollowingController(private val followMessageService: FollowMessageService
      */
     @GetMapping("paging")
     @RestfulPack
-    fun paging(@CurrentUserInfoId followerId: Int?, id: Int?, @PageableDefault(value = 20) pageable: Pageable): Page<UserInfoVo> {
-        if (followerId == null && id == null) throw SignInException("请重新登录")
-        val page = followService.pagingByFollowerId(id ?: followerId!!, pageable)
+    fun paging(@CurrentUserInfoId followerId: Int?, targetId: Int?, @PageableDefault(value = 20) pageable: Pageable): Page<UserInfoVo> {
+        if (followerId == null && targetId == null) throw SignInException("请重新登录")
+        val page = followService.pagingByFollowerId(targetId ?: followerId!!, pageable)
         val userVoList = page.content.map {
             val userVo = UserInfoVo(userInfoService.get(it.followingId))
             userVo.focus = followService.exists(followerId, userVo.id)

@@ -89,9 +89,8 @@ class FootprintController(private val footprintService: FootprintService,
     @RestfulPack
     fun pagingUser(@CurrentUserInfoId userId: Int?, pictureId: Int, @PageableDefault(value = 20) pageable: Pageable): Page<UserInfoVo> {
         val page = footprintService.pagingByPictureId(pictureId, pageable)
-        val picture = pictureDocumentService.get(pictureId)
         val userVoList = page.content.map {
-            getUserVo(picture.createdBy, userId)
+            getUserVo(it.createdBy!!, userId)
         }
         return PageImpl(userVoList, page.pageable, page.totalElements)
     }
