@@ -21,4 +21,6 @@ interface FollowService {
     fun pagingByFollowerId(followerId: Int, pageable: Pageable): Page<Follow>
 
     fun pagingByFollowingId(followingId: Int, pageable: Pageable): Page<Follow>
+
+    fun listByFollowerId(followerId: Int): List<Follow>
 }

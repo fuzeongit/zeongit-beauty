@@ -17,6 +17,7 @@ import com.junjie.web.service.CollectionService
 import com.junjie.web.service.FollowService
 import com.junjie.web.service.PictureDocumentService
 import com.junjie.web.service.PictureService
+import com.junjie.web.vo.CollectionPictureVo
 import com.junjie.web.vo.PictureVo
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -111,6 +112,16 @@ class PictureController(private val pictureService: PictureService,
     @RestfulPack
     fun pagingByRecommend(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureVo> {
         return getPageVo(pictureDocumentService.pagingByRecommend(userId, pageable, startDate, endDate), userId)
+    }
+
+
+    /**
+     * 获取关注人上传的列表
+     */
+    @GetMapping("pagingByFollowing")
+    @RestfulPack
+    fun pagingByFollowing(@CurrentUserInfoId userId: Int, pageable: Pageable): Page<PictureVo> {
+        return getPageVo(pictureDocumentService.pagingByFollowing(userId, pageable), userId)
     }
 
     /**

@@ -6,6 +6,7 @@ import com.junjie.data.constant.PrivacyState
 import com.junjie.data.index.primary.dao.PictureDocumentDao
 import com.junjie.data.index.primary.document.PictureDocument
 import com.junjie.web.service.CollectionService
+import com.junjie.web.service.FollowService
 import com.junjie.web.service.FootprintService
 import com.junjie.web.service.PictureDocumentService
 import org.elasticsearch.index.query.QueryBuilders
@@ -25,7 +26,10 @@ import java.util.*
 class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocumentDao,
                                  private val elasticsearchTemplate: ElasticsearchTemplate,
                                  private val collectionService: CollectionService,
-                                 private val footprintService: FootprintService) : PictureDocumentService {
+                                 private val footprintService: FootprintService,
+                                 private val followService: FollowService
+) : PictureDocumentService {
+
     override fun get(id: Int): PictureDocument {
         return pictureDocumentDao.findById(id).orElseThrow { NotFoundException("图片不存在") }
     }
@@ -43,6 +47,7 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
                         precise: Boolean, name: String?,
                         startDate: Date?, endDate: Date?,
                         userId: Int?, self: Boolean,
+                        mustUserList: List<Int>?,
                         userBlacklist: List<Int>?, pictureBlacklist: List<Int>?): Page<PictureDocument> {
         val mustQuery = QueryBuilders.boolQuery()
         if (tagList != null && tagList.isNotEmpty()) {
@@ -69,6 +74,14 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
         }
         if (userId != null) {
             mustQuery.must(QueryBuilders.termQuery("createdBy", userId))
+        }
+
+        if (userId == null && mustUserList != null) {
+            val boolQuery = QueryBuilders.boolQuery()
+            for (item in mustUserList.toSet()) {
+                boolQuery.should(QueryBuilders.termQuery("createdBy", item))
+            }
+            mustQuery.must(boolQuery)
         }
 
         if (userId == null && userBlacklist != null) {
@@ -121,6 +134,13 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
                 startDate = startDate,
                 endDate = startDate,
                 pictureBlacklist = listOf(id))
+    }
+
+    override fun pagingByFollowing(userId: Int, pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureDocument> {
+        return paging(pageable = pageable,
+                startDate = startDate,
+                endDate = startDate,
+                mustUserList = followService.listByFollowerId(userId).map { it.followingId })
     }
 
     override fun countByTag(tag: String): Long {
@@ -180,6 +200,6 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
     }
 
     override fun listByUserId(userId: Int): List<PictureDocument> {
-       return pictureDocumentDao.findAllByCreatedBy(userId)
+        return pictureDocumentDao.findAllByCreatedBy(userId)
     }
 }

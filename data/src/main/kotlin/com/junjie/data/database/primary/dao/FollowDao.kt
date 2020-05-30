@@ -16,4 +16,6 @@ interface FollowDao : JpaRepository<Follow, Int> {
     fun findAllByCreatedBy(createdBy: Int, pageable: Pageable): Page<Follow>
 
     fun findAllByFollowingId(followingId: Int, pageable: Pageable): Page<Follow>
+
+    fun findAllByCreatedBy(createdBy: Int): List<Follow>
 }

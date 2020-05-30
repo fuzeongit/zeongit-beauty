@@ -5,6 +5,7 @@ import com.junjie.core.annotations.RestfulPack
 import com.junjie.core.exception.SignInException
 import com.junjie.web.service.PictureDocumentService
 import com.junjie.web.vo.TagPictureVo
+import com.junjie.web.vo.UserTagFrequencyVo
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -31,8 +32,6 @@ class TagController(private val pictureDocumentService: PictureDocumentService) 
             TagPictureVo(picture.url, it)
         }
     }
-
-    class UserTagFrequencyVo(var name: String, var amount: Int)
 
     @GetMapping("listTagFrequencyByUserId")
     @RestfulPack

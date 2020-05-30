@@ -14,10 +14,13 @@ interface PictureDocumentService {
                precise: Boolean = false, name: String? = null,
                startDate: Date? = null, endDate: Date? = null,
                userId: Int? = null, self: Boolean = false,
+               mustUserList: List<Int>? = null,
                userBlacklist: List<Int>? = null, pictureBlacklist: List<Int>? = null
     ): Page<PictureDocument>
 
     fun pagingByRecommend(userId: Int?, pageable: Pageable, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
+
+    fun pagingByFollowing(userId: Int, pageable: Pageable, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
 
     fun pagingRecommendById(id: Int, pageable: Pageable, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
 
