@@ -12,10 +12,7 @@ import com.junjie.web.service.PictureDocumentService
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.search.aggregations.AggregationBuilders
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
+import org.springframework.data.domain.*
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
 import org.springframework.stereotype.Service
@@ -137,10 +134,15 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
     }
 
     override fun pagingByFollowing(userId: Int, pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureDocument> {
-        return paging(pageable = pageable,
-                startDate = startDate,
-                endDate = startDate,
-                mustUserList = followService.listByFollowerId(userId).map { it.followingId })
+        val followingList = followService.listByFollowerId(userId)
+        if (followingList.isEmpty()) {
+            return PageImpl(listOf<PictureDocument>(), pageable, 0)
+        } else {
+            return paging(pageable = pageable,
+                    startDate = startDate,
+                    endDate = startDate,
+                    mustUserList = followingList.map { it.followingId })
+        }
     }
 
     override fun countByTag(tag: String): Long {
