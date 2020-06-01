@@ -42,6 +42,14 @@ class PictureController(private val pictureService: PictureService,
                         override val collectionService: CollectionService,
                         override val userInfoService: UserInfoService,
                         override val followService: FollowService) : PictureVoAbstract() {
+    /**
+     * 初始化es
+     */
+    @GetMapping("synchronizationIndexPicture")
+    @RestfulPack
+    fun synchronizationIndexPicture(): Long {
+        return pictureService.synchronizationIndexPicture()
+    }
 
     class SaveDto {
         lateinit var url: String
@@ -94,15 +102,6 @@ class PictureController(private val pictureService: PictureService,
     @RestfulPack
     fun paging(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, tagList: String?, precise: Boolean?, name: String?, startDate: Date?, endDate: Date?, targetId: Int?): Page<PictureVo> {
         return getPageVo(pictureDocumentService.paging(pageable, tagList?.split(" "), precise != null && precise, name, startDate, endDate, targetId, userId != null && targetId == userId), userId)
-    }
-
-    /**
-     * 根据标签获取
-     */
-    @GetMapping("synchronizationIndexPicture")
-    @RestfulPack
-    fun synchronizationIndexPicture(): Long {
-        return pictureService.synchronizationIndexPicture()
     }
 
     /**

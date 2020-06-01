@@ -9,12 +9,16 @@ import com.junjie.core.exception.NotFoundException
 import com.junjie.share.database.account.entity.UserInfo
 import com.junjie.share.dto.UserInfoDto
 import com.junjie.share.service.UserInfoService
+import com.junjie.share.service.UserService
 import org.springframework.web.bind.annotation.*
+import java.util.*
 
 
 @RestController
 @RequestMapping("userInfo")
-class UserInfoController(private val userInfoService: UserInfoService) {
+class UserInfoController(
+        private val userService: UserService,
+        private val userInfoService: UserInfoService) {
 
     /**
      * 创建及修改
@@ -50,5 +54,16 @@ class UserInfoController(private val userInfoService: UserInfoService) {
     @RestfulPack
     fun get(@CurrentUserInfoId id: Int): UserInfo {
         return userInfoService.get(id)
+    }
+
+    /**
+     * 获取用户信息
+     */
+    @Auth
+    @GetMapping("getModifiedPasswordDate")
+    @RestfulPack
+    fun getModifiedPasswordDate(@CurrentUserInfoId id: Int): Date {
+        val info = userInfoService.get(id)
+        return userService.get(info.userId).lastModifiedDate!!
     }
 }
