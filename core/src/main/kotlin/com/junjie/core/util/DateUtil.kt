@@ -387,7 +387,7 @@ object DateUtil {
      * @return 时间戳之差
      */
     fun getDistanceTimestamp(startDate: Date, endDate: Date): Long {
-        return (endDate.time - startDate.time + 1000000) / (3600 * 24 * 1000)
+        return endDate.time - startDate.time
     }
 
     /**
