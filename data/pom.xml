@@ -11,16 +11,12 @@
     <description>数据库及ES索引实体项目</description>
 
     <parent>
-        <groupId>com.junjie</groupId>
+        <groupId>com.zeongit</groupId>
         <artifactId>beauty</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -41,8 +37,9 @@
             <version>6.8.1</version>
         </dependency>
         <dependency>
-            <groupId>com.junjie</groupId>
-            <artifactId>core</artifactId>
+            <groupId>com.zeongit</groupId>
+            <artifactId>share</artifactId>
+            <version>0.0.1</version>
         </dependency>
     </dependencies>
     <build>

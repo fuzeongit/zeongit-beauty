@@ -11,7 +11,7 @@
     <description>后台管理项目接口</description>
 
     <parent>
-        <groupId>com.junjie</groupId>
+        <groupId>com.zeongit</groupId>
         <artifactId>beauty</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
@@ -27,20 +27,17 @@
             <artifactId>jackson-module-kotlin</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.junjie</groupId>
-            <artifactId>core</artifactId>
+            <groupId>com.zeongit</groupId>
+            <artifactId>share</artifactId>
+            <version>0.0.1</version>
         </dependency>
         <dependency>
-            <groupId>com.junjie</groupId>
+            <groupId>com.zeongit</groupId>
             <artifactId>qiniu</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.junjie</groupId>
+            <groupId>com.zeongit</groupId>
             <artifactId>data</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.junjie</groupId>
-            <artifactId>share</artifactId>
         </dependency>
     </dependencies>
 

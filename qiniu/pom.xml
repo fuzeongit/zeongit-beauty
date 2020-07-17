@@ -11,7 +11,7 @@
     <description>访问七牛部分的项目，主要处理图片路径空间管理</description>
 
     <parent>
-        <groupId>com.junjie</groupId>
+        <groupId>com.zeongit</groupId>
         <artifactId>beauty</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
