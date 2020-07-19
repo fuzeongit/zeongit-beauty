@@ -25,8 +25,6 @@ spring:
       cluster-name: elasticsearch
   main:
     allow-bean-definition-overriding: true
-base:
-  notUUID: 00000000000000000000000000000000
 qiniu:
   qiniuAccessKey: 0G397Ly7Z6pqnm2MPUhHIbMFzvBX19yyhu-RdiqI
   qiniuSecretKey: _xLtVKJ4VNUrwSsEGkJBHtV2s6mZ2QG2yDXaCvTk
@@ -38,10 +36,3 @@ qiniu:
   qiniuHeadBucketUrl: http://secdrahead.secdra.com
   qiniuBackBucketUrl: http://secdraback.secdra.com
   qiniuBucketUrl: http://secdraimg.secdra.com
-account:
-  registerVerificationCodePrefix: register_verification_code:%s
-  forgetVerificationCodePrefix: forget_verification_code:%s
-  verificationCodeTimeout: 300000
-  jwtExpiresSecond: 5184000000
-  jwtSecretString: www.secdra.com
-  updatePasswordTimePrefix: base:update_password_time:%s
