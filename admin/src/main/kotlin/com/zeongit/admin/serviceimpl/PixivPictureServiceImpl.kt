@@ -23,7 +23,7 @@ class PixivPictureServiceImpl(
     }
 
     override fun listByState(state: TransferState): List<PixivPicture> {
-        return pixivPictureDao.findAllByState(state)
+        return pixivPictureDao.findAllByStateOrderByCreateDateDesc(state)
     }
 
     override fun listByPixivId(pixivId: String): List<PixivPicture> {

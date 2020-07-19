@@ -10,7 +10,7 @@ import java.util.*
 interface PixivPictureDao : JpaRepository<PixivPicture, Int> {
     fun findAllByPixivId(pixivId: String): List<PixivPicture>
 
-    fun findAllByState(state: TransferState): List<PixivPicture>
+    fun findAllByStateOrderByCreateDateDesc(state: TransferState): List<PixivPicture>
 
     fun findOneByPictureId(pictureId: Int): Optional<PixivPicture>
 }
