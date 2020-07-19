@@ -153,7 +153,7 @@ class PictureController(
                     val pixivUser = pixivPictureService.getAccountByPixivUserId(pixivPicture.pixivUserId!!)
                     userInfoService.get(pixivUser.userId)
                 } catch (e: NotFoundException) {
-                    val info = initUser()
+                    val info = initUser(pixivPicture.pixivUserName)
                     pixivPictureService.saveAccount(info.id!!, pixivPicture.pixivUserId!!)
                     info
                 }
@@ -180,7 +180,7 @@ class PictureController(
                         val pixivUser = pixivPictureService.getAccountByPixivUserId(pixivPicture.pixivUserId!!)
                         userInfoService.get(pixivUser.userId)
                     } catch (e: NotFoundException) {
-                        val info = initUser()
+                        val info = initUser(pixivPicture.pixivUserName)
                         pixivPictureService.saveAccount(info.id!!, pixivPicture.pixivUserId!!)
                         info
                     }
@@ -195,6 +195,7 @@ class PictureController(
         }
         return true
     }
+
 
     /**
      * 建立ES索引
@@ -218,6 +219,25 @@ class PictureController(
     /**
      * 初始化进ES
      */
+    @PostMapping("rename")
+    @RestfulPack
+    fun rename(): Boolean {
+        val list = pictureService.list()
+        for(item in list){
+            val pixivPicture = pixivPictureService.getByPictureId(item.id!!)
+            val userInfo = userInfoService.get(item.createdBy!!)
+
+            userInfo.introduction = pixivPicture.pixivUserName ?: "镜花水月"
+            userInfo.nickname = pixivPicture.pixivUserName ?: "镜花水月"
+            userInfoService.save(userInfo)
+        }
+        return true
+    }
+
+
+    /**
+     * 初始化进ES
+     */
     @PostMapping("push")
     @RestfulPack
     fun push(userId: Int): Int {
@@ -232,14 +252,14 @@ class PictureController(
     }
 
 
-    fun initUser(): UserInfo {
+    fun initUser(nickname: String?): UserInfo {
         var phone = Random().nextInt(10)
         while (userService.existsByPhone(phone.toString())) {
             phone += Random().nextInt(1000)
         }
         val user = userService.signUp(phone.toString(), "123456")
         val gender = if (phone % 2 == 0) Gender.FEMALE else Gender.MALE
-        val info = UserInfo(gender = gender)
+        val info = UserInfo(gender = gender, nickname = nickname ?: "镜花水月", introduction = nickname ?: "镜花水月")
         info.userId = user.id!!
         return userInfoService.save(info)
     }
