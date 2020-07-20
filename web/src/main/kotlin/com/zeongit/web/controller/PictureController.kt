@@ -68,6 +68,10 @@ class PictureController(private val pictureService: PictureService,
         var tagList: Set<String>? = null
     }
 
+    class HideDto {
+        var id: Int = 0
+    }
+
     class RemoveDto {
         var id: Int = 0
     }
@@ -185,8 +189,7 @@ class PictureController(private val pictureService: PictureService,
     @PostMapping("update")
     @RestfulPack
     fun update(@CurrentUserInfoId userId: Int, @RequestBody dto: UpdateDto): PictureVo {
-        val picture = pictureService.get(dto.id)
-        picture.createdBy != userId && throw PermissionException("您无权修改该图片")
+        val picture = pictureService.getSelf(dto.id, userId)
         picture.name = dto.name ?: picture.name
         picture.introduction = dto.introduction ?: picture.introduction
         picture.privacy = dto.privacy ?: picture.privacy
@@ -209,6 +212,14 @@ class PictureController(private val pictureService: PictureService,
         return getPictureVo(pictureService.save(picture), userId)
     }
 
+    @Auth
+    @PostMapping("hide")
+    @RestfulPack
+    fun hide(@CurrentUserInfoId userId: Int, @RequestBody dto: HideDto): PrivacyState {
+        val picture = pictureService.getSelf(dto.id, userId)
+        return pictureService.hide(picture)
+    }
+
     /**
      * 逻辑删除图片
      */
@@ -216,10 +227,7 @@ class PictureController(private val pictureService: PictureService,
     @PostMapping("remove")
     @RestfulPack
     fun remove(@CurrentUserInfoId userId: Int, @RequestBody dto: RemoveDto): Boolean {
-        val picture = pictureService.get(dto.id)
-        if (userId != picture.createdBy) {
-            throw PermissionException("你无权删除该图片")
-        }
+        val picture = pictureService.getSelf(dto.id, userId)
         return pictureService.remove(picture)
     }
 
@@ -231,10 +239,7 @@ class PictureController(private val pictureService: PictureService,
     @RestfulPack
     fun batchRemove(@CurrentUserInfoId userId: Int, @RequestBody dto: BatchRemoveDto): Boolean {
         for (id in dto.idList) {
-            val picture = pictureService.get(id)
-            if (userId != picture.createdBy) {
-                throw PermissionException("你无权删除该图片")
-            }
+            val picture = pictureService.getSelf(id, userId)
             bucketService.move(picture.url, qiniuConfig.qiniuTempBucket, qiniuConfig.qiniuBucket)
             pictureService.remove(picture)
         }

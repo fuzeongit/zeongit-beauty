@@ -19,7 +19,11 @@ interface PictureService {
 
     fun get(id: Int): Picture
 
+    fun getSelf(id: Int, userId: Int): Picture
+
     fun getByLife(id: Int, life: PictureLifeState? = null): Picture
+
+    fun hide(picture: Picture): PrivacyState
 
     /**
      * 逻辑删除
@@ -43,6 +47,7 @@ interface PictureService {
     fun listByUserId(userId: Int): List<Picture>
 
     fun listByUserIdAndLife(userId: Int, life: PictureLifeState?): List<Picture>
+
     /**
      * @param force 是否强制更新
      */

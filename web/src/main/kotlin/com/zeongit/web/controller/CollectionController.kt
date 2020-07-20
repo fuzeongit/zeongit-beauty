@@ -141,7 +141,7 @@ class CollectionController(override val pictureDocumentService: PictureDocumentS
 
     @GetMapping("pagingUser")
     @RestfulPack
-    fun pagingUser(@CurrentUserInfoId userId: Int?, pictureId: Int, @PageableDefault(value = 20) pageable: Pageable): Page<UserInfoVo> {
+    fun pagingUser(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, pictureId: Int): Page<UserInfoVo> {
         val page = collectionService.pagingByPictureId(pageable, pictureId)
         val userVoList = page.content.map {
             getUserVo(it.createdBy!!, userId)

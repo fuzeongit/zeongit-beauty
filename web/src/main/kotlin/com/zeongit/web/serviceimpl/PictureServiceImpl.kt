@@ -8,6 +8,7 @@ import com.zeongit.data.constant.SizeType
 import com.zeongit.data.database.primary.dao.PictureDao
 import com.zeongit.data.database.primary.entity.Picture
 import com.zeongit.data.index.primary.document.PictureDocument
+import com.zeongit.share.exception.PermissionException
 import com.zeongit.web.service.PictureDocumentService
 import com.zeongit.web.service.PictureService
 import org.springframework.data.domain.Page
@@ -61,11 +62,27 @@ class PictureServiceImpl(private val pictureDao: PictureDao,
         return getByLife(id, PictureLifeState.EXIST)
     }
 
+    override fun getSelf(id: Int, userId: Int): Picture {
+        val picture = get(id)
+        picture.createdBy != userId && throw PermissionException("您无权操作该图片")
+        return picture
+    }
+
     override fun getByLife(id: Int, life: PictureLifeState?): Picture {
         if (life != null) {
             return pictureDao.findByIdAndLife(id, life).orElseThrow { NotFoundException("图片不存在") }
         }
         return pictureDao.findById(id).orElseThrow { NotFoundException("图片不存在") }
+    }
+
+    override fun hide(picture: Picture): PrivacyState {
+        when (picture.privacy) {
+            PrivacyState.PRIVATE -> picture.privacy = PrivacyState.PUBLIC
+            PrivacyState.PUBLIC -> picture.privacy = PrivacyState.PRIVATE
+            else -> picture.privacy
+        }
+        save(picture)
+        return picture.privacy
     }
 
     override fun remove(picture: Picture): Boolean {
