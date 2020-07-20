@@ -93,8 +93,8 @@ class PictureController(private val pictureService: PictureService,
      */
     @GetMapping("paging")
     @RestfulPack
-    fun paging(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, tagList: String?, precise: Boolean?, name: String?, startDate: Date?, endDate: Date?, targetId: Int?): Page<PictureVo> {
-        return getPageVo(pictureDocumentService.paging(pageable, tagList?.split(" "), precise != null && precise, name, startDate, endDate, targetId, userId != null && targetId == userId), userId)
+    fun paging(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, tagList: String?, precise: Boolean?, name: String?, startDate: Date?, endDate: Date?): Page<PictureVo> {
+        return getPageVo(pictureDocumentService.paging(pageable, tagList?.split(" "), precise != null && precise, name, startDate, endDate), userId)
     }
 
     /**

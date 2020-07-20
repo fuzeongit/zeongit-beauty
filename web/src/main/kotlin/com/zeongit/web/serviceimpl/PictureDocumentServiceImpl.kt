@@ -104,7 +104,7 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
         val tagList = mutableListOf<String>()
         val collectionPictureIdList = mutableListOf<Int>()
         if (userId != null) {
-            val collectionList = collectionService.pagingByUserId(userId, PageRequest.of(0, 5)).content
+            val collectionList = collectionService.paging(PageRequest.of(0, 5), userId).content
             for (collection in collectionList) {
                 collectionPictureIdList.add(collection.pictureId)
                 try {

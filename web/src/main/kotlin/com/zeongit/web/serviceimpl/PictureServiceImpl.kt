@@ -25,7 +25,7 @@ class PictureServiceImpl(private val pictureDao: PictureDao,
         val specification = Specification<Picture> { root, _, criteriaBuilder ->
             val predicatesList = ArrayList<Predicate>()
             if (!name.isNullOrEmpty()) {
-                predicatesList.add(criteriaBuilder.like(root.get<String>("name"), "%$name%"))
+                predicatesList.add(criteriaBuilder.like(root.get("name"), "%$name%"))
             }
             if (privacy != null) {
                 predicatesList.add(criteriaBuilder.equal(root.get<Int>("privacy"), privacy))
@@ -35,9 +35,9 @@ class PictureServiceImpl(private val pictureDao: PictureDao,
             }
             if (master != null) {
                 if (master) {
-                    predicatesList.add(criteriaBuilder.like(root.get<String>("url"), "%_p0%"))
+                    predicatesList.add(criteriaBuilder.like(root.get("url"), "%_p0%"))
                 } else {
-                    predicatesList.add(criteriaBuilder.notLike(root.get<String>("url"), "%_p0%"))
+                    predicatesList.add(criteriaBuilder.notLike(root.get("url"), "%_p0%"))
                 }
             }
             if (startDate != null) {

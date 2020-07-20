@@ -4,6 +4,7 @@ import com.zeongit.data.constant.CollectState
 import com.zeongit.data.database.primary.entity.Collection
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import java.util.*
 
 
 /**
@@ -21,7 +22,7 @@ interface CollectionService {
 
     fun countByPictureId(pictureId: Int): Long
 
-    fun pagingByUserId(userId: Int, pageable: Pageable): Page<Collection>
+    fun paging(pageable: Pageable, userId: Int, startDate: Date? = null, endDate: Date? = null): Page<Collection>
 
     fun pagingByPictureId(pictureId: Int, pageable: Pageable): Page<Collection>
 }

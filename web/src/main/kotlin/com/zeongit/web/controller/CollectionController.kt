@@ -21,6 +21,8 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * @author fjj
@@ -36,8 +38,8 @@ class CollectionController(override val pictureDocumentService: PictureDocumentS
         var pictureId: Int = 0
     }
 
-    class UnFocusDto{
-        var pictureIdList:List<Int>? = null
+    class UnFocusDto {
+        var pictureIdList: List<Int>? = null
             get() {
                 if (field == null || field!!.isEmpty()) {
                     throw ProgramException("请选择一张图片")
@@ -111,9 +113,9 @@ class CollectionController(override val pictureDocumentService: PictureDocumentS
      */
     @GetMapping("paging")
     @RestfulPack
-    fun paging(@CurrentUserInfoId userId: Int?, targetId: Int?, @PageableDefault(value = 20) pageable: Pageable): Page<CollectionPictureVo> {
+    fun paging(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, targetId: Int?, startDate: Date?, endDate: Date?): Page<CollectionPictureVo> {
         (userId == null && targetId == null) && throw SignInException("请重新登录")
-        val page = collectionService.pagingByUserId(targetId ?: userId!!, pageable)
+        val page = collectionService.paging(pageable, targetId ?: userId!!, startDate, endDate)
         val collectionPictureVoList = ArrayList<CollectionPictureVo>()
         for (collection in page.content) {
             val collectionPictureVo = try {
