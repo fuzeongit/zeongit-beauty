@@ -18,11 +18,11 @@ interface PictureDocumentService {
                userBlacklist: List<Int>? = null, pictureBlacklist: List<Int>? = null
     ): Page<PictureDocument>
 
-    fun pagingByRecommend(userId: Int?, pageable: Pageable, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
+    fun pagingByRecommend(pageable: Pageable, userId: Int?, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
 
-    fun pagingByFollowing(userId: Int, pageable: Pageable, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
+    fun pagingByFollowing(pageable: Pageable, userId: Int, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
 
-    fun pagingRecommendById(id: Int, pageable: Pageable, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
+    fun pagingRecommendById(pageable: Pageable, id: Int, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
 
     fun countByTag(tag: String): Long
 

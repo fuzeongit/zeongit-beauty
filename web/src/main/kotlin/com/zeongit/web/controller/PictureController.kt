@@ -103,7 +103,7 @@ class PictureController(private val pictureService: PictureService,
     @GetMapping("pagingByRecommend")
     @RestfulPack
     fun pagingByRecommend(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureVo> {
-        return getPageVo(pictureDocumentService.pagingByRecommend(userId, pageable, startDate, endDate), userId)
+        return getPageVo(pictureDocumentService.pagingByRecommend(pageable, userId, startDate, endDate), userId)
     }
 
 
@@ -113,7 +113,7 @@ class PictureController(private val pictureService: PictureService,
     @GetMapping("pagingByFollowing")
     @RestfulPack
     fun pagingByFollowing(@CurrentUserInfoId userId: Int, pageable: Pageable): Page<PictureVo> {
-        return getPageVo(pictureDocumentService.pagingByFollowing(userId, pageable), userId)
+        return getPageVo(pictureDocumentService.pagingByFollowing(pageable, userId), userId)
     }
 
     /**
@@ -122,7 +122,7 @@ class PictureController(private val pictureService: PictureService,
     @GetMapping("pagingRecommendById")
     @RestfulPack
     fun pagingRecommendById(@CurrentUserInfoId userId: Int?, id: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureVo> {
-        return getPageVo(pictureDocumentService.pagingRecommendById(id, pageable, startDate, endDate), userId)
+        return getPageVo(pictureDocumentService.pagingRecommendById(pageable, id, startDate, endDate), userId)
     }
 
     /**

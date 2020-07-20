@@ -18,9 +18,9 @@ interface FollowService {
 
     fun remove(followerId: Int, followingId: Int): Boolean
 
-    fun pagingByFollowerId(followerId: Int, pageable: Pageable): Page<Follow>
+    fun pagingByFollowerId(pageable: Pageable, followerId: Int): Page<Follow>
 
-    fun pagingByFollowingId(followingId: Int, pageable: Pageable): Page<Follow>
+    fun pagingByFollowingId(pageable: Pageable, followingId: Int): Page<Follow>
 
     fun listByFollowerId(followerId: Int): List<Follow>
 }

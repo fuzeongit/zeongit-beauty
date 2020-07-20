@@ -18,7 +18,7 @@ class FeedbackServiceImpl(private val feedbackDao: FeedbackDao) : FeedbackServic
         return feedbackDao.save(feedback)
     }
 
-    override fun paging(email: String?, pageable: Pageable): Page<Feedback> {
+    override fun paging(pageable: Pageable, email: String?): Page<Feedback> {
         return if (email.isNullOrBlank()) {
             feedbackDao.findAll(pageable)
         } else {

@@ -24,5 +24,5 @@ interface CollectionService {
 
     fun paging(pageable: Pageable, userId: Int, startDate: Date? = null, endDate: Date? = null): Page<Collection>
 
-    fun pagingByPictureId(pictureId: Int, pageable: Pageable): Page<Collection>
+    fun pagingByPictureId(pageable: Pageable, pictureId: Int, startDate: Date? = null, endDate: Date? = null): Page<Collection>
 }

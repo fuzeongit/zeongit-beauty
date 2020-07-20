@@ -16,8 +16,4 @@ interface CollectionDao : JpaRepository<Collection, Int>, JpaSpecificationExecut
     fun deleteByCreatedByAndPictureId(createdBy: Int, pictureId: Int)
 
     fun countByPictureId(pictureId: Int): Long
-
-    fun findAllByCreatedBy(createdBy: Int, pageable: Pageable): Page<Collection>
-
-    fun findAllByPictureId(pictureId: Int, pageable: Pageable): Page<Collection>
 }

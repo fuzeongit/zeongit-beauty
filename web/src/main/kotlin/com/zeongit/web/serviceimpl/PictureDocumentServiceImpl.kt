@@ -100,7 +100,7 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
         return pictureDocumentDao.search(mustQuery, pageable)
     }
 
-    override fun pagingByRecommend(userId: Int?, pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureDocument> {
+    override fun pagingByRecommend(pageable: Pageable, userId: Int?, startDate: Date?, endDate: Date?): Page<PictureDocument> {
         val tagList = mutableListOf<String>()
         val collectionPictureIdList = mutableListOf<Int>()
         if (userId != null) {
@@ -120,7 +120,7 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
                 pictureBlacklist = collectionPictureIdList)
     }
 
-    override fun pagingRecommendById(id: Int, pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureDocument> {
+    override fun pagingRecommendById(pageable: Pageable, id: Int, startDate: Date?, endDate: Date?): Page<PictureDocument> {
         val tagList = try {
             get(id).tagList
         } catch (e: Exception) {
@@ -133,7 +133,7 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
                 pictureBlacklist = listOf(id))
     }
 
-    override fun pagingByFollowing(userId: Int, pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureDocument> {
+    override fun pagingByFollowing(pageable: Pageable, userId: Int, startDate: Date?, endDate: Date?): Page<PictureDocument> {
         val followingList = followService.listByFollowerId(userId)
         if (followingList.isEmpty()) {
             return PageImpl(listOf<PictureDocument>(), pageable, 0)

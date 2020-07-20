@@ -77,7 +77,7 @@ class CommentController(private val commentService: CommentService,
     @GetMapping("pagingByPictureId")
     @RestfulPack
     fun pagingByPictureId(@CurrentUserInfoId userId: Int?, pictureId: Int, @PageableDefault(value = 20) pageable: Pageable): Page<CommentVo> {
-        return getPageVo(commentService.paging(pictureId, pageable), userId)
+        return getPageVo(commentService.paging(pageable, pictureId), userId)
     }
 
     private fun getPageVo(page: Page<Comment>, userId: Int? = null): Page<CommentVo> {

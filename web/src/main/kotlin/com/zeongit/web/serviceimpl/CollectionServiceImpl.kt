@@ -3,7 +3,6 @@ package com.zeongit.web.serviceimpl
 import com.zeongit.data.constant.CollectState
 import com.zeongit.data.database.primary.dao.CollectionDao
 import com.zeongit.data.database.primary.entity.Collection
-import com.zeongit.data.database.primary.entity.Picture
 import com.zeongit.share.util.DateUtil
 import com.zeongit.web.service.CollectionService
 import org.springframework.data.domain.Page
@@ -42,18 +41,23 @@ class CollectionServiceImpl(private val collectionDao: CollectionDao) : Collecti
     }
 
     override fun paging(pageable: Pageable, userId: Int, startDate: Date?, endDate: Date?): Page<Collection> {
-        return collectionDao.findAll(getSpecification(userId, startDate, endDate), pageable)
+        return collectionDao.findAll(getSpecification(userId = userId, startDate = startDate, endDate = endDate), pageable)
     }
 
-    override fun pagingByPictureId(pictureId: Int, pageable: Pageable): Page<Collection> {
-        return collectionDao.findAllByPictureId(pictureId, pageable)
+    override fun pagingByPictureId(pageable: Pageable, pictureId: Int, startDate: Date?, endDate: Date?): Page<Collection> {
+        return collectionDao.findAll(getSpecification(pictureId = pictureId, startDate = startDate, endDate = endDate), pageable)
     }
 
-    private fun getSpecification(userId: Int, startDate: Date?, endDate: Date?)
+    private fun getSpecification(userId: Int? = null, pictureId: Int? = null, startDate: Date? = null, endDate: Date? = null)
             : Specification<Collection> {
         return Specification<Collection> { root, _, criteriaBuilder ->
             val predicatesList = ArrayList<Predicate>()
-            predicatesList.add(criteriaBuilder.equal(root.get<Int>("createdBy"), userId))
+            if (userId != null) {
+                predicatesList.add(criteriaBuilder.equal(root.get<Int>("createdBy"), userId))
+            }
+            if (pictureId != null) {
+                predicatesList.add(criteriaBuilder.equal(root.get<Int>("pictureId"), pictureId))
+            }
             if (startDate != null) {
                 predicatesList.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createDate"), DateUtil.getDayBeginTime(startDate)))
             }

@@ -19,5 +19,5 @@ interface CommentService {
 
     fun listTop4(pictureId: Int): List<Comment>
 
-    fun paging(pictureId: Int, pageable: Pageable): Page<Comment>
+    fun paging(pageable: Pageable, pictureId: Int): Page<Comment>
 }

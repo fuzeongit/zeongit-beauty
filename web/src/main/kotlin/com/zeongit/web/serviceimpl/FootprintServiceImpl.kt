@@ -1,13 +1,16 @@
 package com.zeongit.web.serviceimpl
 
-import com.zeongit.share.exception.NotFoundException
 import com.zeongit.data.database.primary.dao.FootprintDao
 import com.zeongit.data.database.primary.entity.Footprint
+import com.zeongit.share.exception.NotFoundException
+import com.zeongit.share.util.DateUtil
 import com.zeongit.web.service.FootprintService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import java.util.*
+import javax.persistence.criteria.Predicate
 
 @Service
 class FootprintServiceImpl(private val footprintDao: FootprintDao) : FootprintService {
@@ -43,11 +46,31 @@ class FootprintServiceImpl(private val footprintDao: FootprintDao) : FootprintSe
         return footprintDao.countByPictureId(pictureId)
     }
 
-    override fun pagingByUserId(userId: Int, pageable: Pageable): Page<Footprint> {
-        return footprintDao.findAllByCreatedBy(userId, pageable)
+    override fun paging(pageable: Pageable, userId: Int, startDate: Date?, endDate: Date?): Page<Footprint> {
+        return footprintDao.findAll(getSpecification(userId = userId, startDate = startDate, endDate = endDate), pageable)
     }
 
-    override fun pagingByPictureId(pictureId: Int, pageable: Pageable): Page<Footprint> {
-        return footprintDao.findAllByPictureId(pictureId, pageable)
+    override fun pagingByPictureId(pageable: Pageable, pictureId: Int, startDate: Date?, endDate: Date?): Page<Footprint> {
+        return footprintDao.findAll(getSpecification(pictureId = pictureId, startDate = startDate, endDate = endDate), pageable)
+    }
+
+    private fun getSpecification(userId: Int? = null, pictureId: Int? = null, startDate: Date? = null, endDate: Date? = null)
+            : Specification<Footprint> {
+        return Specification<Footprint> { root, _, criteriaBuilder ->
+            val predicatesList = ArrayList<Predicate>()
+            if (userId != null) {
+                predicatesList.add(criteriaBuilder.equal(root.get<Int>("createdBy"), userId))
+            }
+            if (pictureId != null) {
+                predicatesList.add(criteriaBuilder.equal(root.get<Int>("pictureId"), pictureId))
+            }
+            if (startDate != null) {
+                predicatesList.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createDate"), DateUtil.getDayBeginTime(startDate)))
+            }
+            if (endDate != null) {
+                predicatesList.add(criteriaBuilder.lessThanOrEqualTo(root.get("createDate"), DateUtil.getDayEndTime(endDate)))
+            }
+            criteriaBuilder.and(*predicatesList.toArray(arrayOfNulls<Predicate>(predicatesList.size)))
+        }
     }
 }
