@@ -16,10 +16,7 @@ import com.zeongit.qiniu.service.BucketService
 import com.zeongit.share.enum.Gender
 import com.zeongit.share.database.account.entity.UserInfo
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.io.File
 import java.io.FileInputStream
 import java.util.*
@@ -38,28 +35,29 @@ class PictureController(
 
     class PictureInitVO(var errorUrlList: List<String>, var errorReadList: List<String>, var readNumber: Int)
 
+    class IdListDto(var idList: List<Int>)
+
     /**
      * 更新隐藏状态
      */
-    @PostMapping("updatePrivacy")
+    @PostMapping("hide")
     @RestfulPack
-    fun updatePrivacy(id: Int): Boolean {
+    fun hide(id: Int): PrivacyState {
         val picture = pictureService.get(id)
         picture.privacy = when (picture.privacy) {
             PrivacyState.PRIVATE -> PrivacyState.PUBLIC
             PrivacyState.PUBLIC -> PrivacyState.PRIVATE
         }
-        pictureService.save(picture)
-        return true
+        return pictureService.save(picture).privacy
     }
 
     /**
      * 逻辑删除图片
      */
-    @PostMapping("batchRemove")
+    @PostMapping("remove")
     @RestfulPack
-    fun batchRemove(@RequestParam("idList") idList: Array<Int>): Boolean {
-        for (id in idList) {
+    fun remove(@RequestBody idListDto: IdListDto): Boolean {
+        for (id in idListDto.idList) {
             val picture = pictureService.get(id)
             pictureService.remove(picture)
         }
@@ -71,8 +69,8 @@ class PictureController(
      */
     @PostMapping("reduction")
     @RestfulPack
-    fun reduction(@RequestParam("idList") idList: Array<Int>): Boolean {
-        for (id in idList) {
+    fun reduction(@RequestBody idListDto: IdListDto): Boolean {
+        for (id in idListDto.idList) {
             pictureService.reduction(id)
         }
         return true
@@ -82,17 +80,16 @@ class PictureController(
      * 物理删除图片
      * 慎用
      */
-    @PostMapping("batchDelete")
+    @PostMapping("delete")
     @RestfulPack
-    fun batchDelete(@RequestParam("idList") idList: Array<Int>): Boolean {
-        for (id in idList) {
+    fun delete(@RequestBody idListDto: IdListDto): Boolean {
+        for (id in idListDto.idList) {
             val picture = pictureService.getByLife(id)
             bucketService.move(picture.url, qiniuConfig.qiniuTempBucket, qiniuConfig.qiniuBucket)
             pictureService.delete(id)
         }
         return true
     }
-
 
     /**
      * 根据文件夹写入图片写入数据库
@@ -136,64 +133,6 @@ class PictureController(
             }
         }
         return PictureInitVO(errorUrlList, errorReadList, readNumber)
-    }
-
-    /**
-     * 绑定user
-     */
-    @PostMapping("bindUser")
-    @RestfulPack
-    fun bindUser(userId: Int): Boolean {
-        //临时id
-        val pictureList = pictureService.listByUserId(userId)
-        for (picture in pictureList) {
-            val pixivPicture = pixivPictureService.getByPictureId(picture.id!!)
-            if (pixivPicture.state == TransferState.SUCCESS) {
-                val info = try {
-                    val pixivUser = pixivPictureService.getAccountByPixivUserId(pixivPicture.pixivUserId!!)
-                    userInfoService.get(pixivUser.userId)
-                } catch (e: NotFoundException) {
-                    val info = initUser(pixivPicture.pixivUserName)
-                    pixivPictureService.saveAccount(info.id!!, pixivPicture.pixivUserId!!)
-                    info
-                }
-                picture.createdBy = info.id!!
-                picture.lastModifiedBy = info.id!!
-                pictureService.save(picture)
-            }
-        }
-        return true
-    }
-
-    /**
-     * 绑定user
-     */
-    @PostMapping("bindUser2")
-    @RestfulPack
-    fun bindUser2(): Boolean {
-        val pictureList = pictureService.list()
-        for (picture in pictureList) {
-            try {
-                val pixivPicture = pixivPictureService.getByPictureId(picture.id!!)
-                if (pixivPicture.pixivUserId != null) {
-                    val info = try {
-                        val pixivUser = pixivPictureService.getAccountByPixivUserId(pixivPicture.pixivUserId!!)
-                        userInfoService.get(pixivUser.userId)
-                    } catch (e: NotFoundException) {
-                        val info = initUser(pixivPicture.pixivUserName)
-                        pixivPictureService.saveAccount(info.id!!, pixivPicture.pixivUserId!!)
-                        info
-                    }
-                    picture.createdBy = info.id!!
-                    picture.lastModifiedBy = info.id!!
-                    pictureService.save(picture)
-                }
-            } catch (e: Exception) {
-                val pixivPicture = PixivPicture(picture.url.split("_")[0], picture.id!!)
-                pixivPictureService.save(pixivPicture)
-            }
-        }
-        return true
     }
 
 
@@ -252,15 +191,21 @@ class PictureController(
     }
 
 
-    fun initUser(nickname: String?): UserInfo {
-        var phone = Random().nextInt(10)
-        while (userService.existsByPhone(phone.toString())) {
-            phone += Random().nextInt(1000)
+
+    /**
+     * 获取套图
+     */
+    @GetMapping("listPictureBySuit")
+    @RestfulPack
+    fun listPictureBySuit(pixivId: String): List<Picture> {
+        val list = pixivPictureService.listByPixivId(pixivId)
+        val resultList = mutableListOf<Picture>()
+        for (item in list) {
+            try {
+                resultList.add(pictureService.getByLife(item.pictureId))
+            } catch (e: NotFoundException) {
+            }
         }
-        val user = userService.signUp(phone.toString(), "123456")
-        val gender = if (phone % 2 == 0) Gender.FEMALE else Gender.MALE
-        val info = UserInfo(gender = gender, nickname = nickname ?: "镜花水月", introduction = nickname ?: "镜花水月")
-        info.userId = user.id!!
-        return userInfoService.save(info)
+        return resultList
     }
 }

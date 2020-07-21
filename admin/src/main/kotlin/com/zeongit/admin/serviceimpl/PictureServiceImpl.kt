@@ -10,11 +10,14 @@ import com.zeongit.data.database.primary.entity.Picture
 import com.zeongit.data.index.primary.document.PictureDocument
 import com.zeongit.admin.service.PictureDocumentService
 import com.zeongit.admin.service.PictureService
+import com.zeongit.data.database.primary.entity.Tag
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import java.util.*
+import javax.persistence.criteria.Join
+import javax.persistence.criteria.JoinType
 import javax.persistence.criteria.Predicate
 
 
@@ -25,7 +28,11 @@ class PictureServiceImpl(private val pictureDao: PictureDao,
         val specification = Specification<Picture> { root, _, criteriaBuilder ->
             val predicatesList = ArrayList<Predicate>()
             if (!name.isNullOrEmpty()) {
-                predicatesList.add(criteriaBuilder.like(root.get<String>("name"), "%$name%"))
+                val namePredicatesList = ArrayList<Predicate>()
+                val joinTag: Join<Picture, Tag> = root.join("tagList", JoinType.LEFT)
+                namePredicatesList.add(criteriaBuilder.like(root.get("name"), "%$name%"))
+                namePredicatesList.add(criteriaBuilder.like(joinTag.get("name"), "%$name%"))
+                predicatesList.add(criteriaBuilder.or(*namePredicatesList.toArray(arrayOfNulls<Predicate>(namePredicatesList.size)))
             }
             if (privacy != null) {
                 predicatesList.add(criteriaBuilder.equal(root.get<Int>("privacy"), privacy))
@@ -35,9 +42,9 @@ class PictureServiceImpl(private val pictureDao: PictureDao,
             }
             if (master != null) {
                 if (master) {
-                    predicatesList.add(criteriaBuilder.like(root.get<String>("url"), "%_p0%"))
+                    predicatesList.add(criteriaBuilder.like(root.get("url"), "%_p0%"))
                 } else {
-                    predicatesList.add(criteriaBuilder.notLike(root.get<String>("url"), "%_p0%"))
+                    predicatesList.add(criteriaBuilder.notLike(root.get("url"), "%_p0%"))
                 }
             }
             if (startDate != null) {
@@ -53,6 +60,7 @@ class PictureServiceImpl(private val pictureDao: PictureDao,
                 predicatesList.add(criteriaBuilder.equal(root.get<String>("sizeType"), sizeType))
             }
             criteriaBuilder.and(*predicatesList.toArray(arrayOfNulls<Predicate>(predicatesList.size)))
+
         }
         return pictureDao.findAll(specification, pageable)
     }

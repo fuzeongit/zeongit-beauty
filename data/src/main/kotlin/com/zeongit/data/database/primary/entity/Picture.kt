@@ -63,10 +63,10 @@ class Picture() : AskEntity(), Serializable {
     var tagList: MutableSet<Tag> = TreeSet { o1, o2 -> o1.name.compareTo(o2.name) }
 
 
-    constructor(url: String, width: Long, height: Long, name: String? = "无题", introduction: String? = "身无彩凤双飞翼，心有灵犀一点通", privacy: PrivacyState = PrivacyState.PUBLIC) : this() {
+    constructor(url: String, width: Long, height: Long, name: String?, introduction: String?, privacy: PrivacyState = PrivacyState.PUBLIC) : this() {
         this.url = url
         this.name = name ?: "无题"
-        this.introduction = introduction ?: "身无彩凤双飞翼，心有灵犀一点通"
+        this.introduction = introduction ?: "这是一张我从p站下载的图片，很好看啊，真的很好看啊，所以把他放在自己的网站上，侵删"
         this.width = width
         this.height = height
         this.privacy = privacy
