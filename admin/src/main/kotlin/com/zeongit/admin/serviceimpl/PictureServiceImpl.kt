@@ -32,7 +32,7 @@ class PictureServiceImpl(private val pictureDao: PictureDao,
                 val joinTag: Join<Picture, Tag> = root.join("tagList", JoinType.LEFT)
                 namePredicatesList.add(criteriaBuilder.like(root.get("name"), "%$name%"))
                 namePredicatesList.add(criteriaBuilder.like(joinTag.get("name"), "%$name%"))
-                predicatesList.add(criteriaBuilder.or(*namePredicatesList.toArray(arrayOfNulls<Predicate>(namePredicatesList.size)))
+                predicatesList.add(criteriaBuilder.or(*namePredicatesList.toArray(arrayOfNulls<Predicate>(namePredicatesList.size))))
             }
             if (privacy != null) {
                 predicatesList.add(criteriaBuilder.equal(root.get<Int>("privacy"), privacy))
