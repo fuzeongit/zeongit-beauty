@@ -4,15 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.zeongit</groupId>
-    <artifactId>beauty</artifactId>
+    <artifactId>zeongit-beauty</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>beauty</name>
+    <name>zeongit-beauty</name>
     <description>总项目，项目总依赖</description>
 
     <modules>
-        <module>account</module>
         <module>data</module>
         <module>qiniu</module>
         <module>web</module>
@@ -35,11 +34,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.zeongit</groupId>
-                <artifactId>account</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
-            </dependency>
             <dependency>
                 <groupId>com.zeongit</groupId>
                 <artifactId>data</artifactId>

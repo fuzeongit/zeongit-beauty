@@ -12,7 +12,7 @@
 
     <parent>
         <groupId>com.zeongit</groupId>
-        <artifactId>beauty</artifactId>
+        <artifactId>zeongit-beauty</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
