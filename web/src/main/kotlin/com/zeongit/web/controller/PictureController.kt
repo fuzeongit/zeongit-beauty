@@ -157,7 +157,6 @@ class PictureController(private val pictureService: PictureService,
         return pictureDocumentService.countByTag(tag)
     }
 
-
     /**
      * 保存图片
      */
@@ -165,11 +164,11 @@ class PictureController(private val pictureService: PictureService,
     @PostMapping("save")
     @RestfulPack
     fun save(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): PictureVo {
-        bucketService.move(dto.url, qiniuConfig.qiniuBucket)
+        bucketService.move(dto.url, qiniuConfig.qiniuPictureBucket,qiniuConfig.qiniuTemporaryBucket)
         val imageInfo = bucketService.getImageInfo(
                 dto.url,
-                qiniuConfig.qiniuBucketUrl
-        ) ?: throw ProgramException("移除图片出错")
+                qiniuConfig.qiniuPictureBucketUrl
+        ) ?: throw ProgramException("获取图片信息出错")
         val picture = Picture(dto.url,
                 imageInfo.width,
                 imageInfo.height,
@@ -186,9 +185,9 @@ class PictureController(private val pictureService: PictureService,
      * 更新
      */
     @Auth
-    @PostMapping("update")
+    @PostMapping("modified")
     @RestfulPack
-    fun update(@CurrentUserInfoId userId: Int, @RequestBody dto: UpdateDto): PictureVo {
+    fun modified(@CurrentUserInfoId userId: Int, @RequestBody dto: UpdateDto): PictureVo {
         val picture = pictureService.getSelf(dto.id, userId)
         picture.name = dto.name ?: picture.name
         picture.introduction = dto.introduction ?: picture.introduction
@@ -240,7 +239,7 @@ class PictureController(private val pictureService: PictureService,
     fun batchRemove(@CurrentUserInfoId userId: Int, @RequestBody dto: BatchRemoveDto): Boolean {
         for (id in dto.idList) {
             val picture = pictureService.getSelf(id, userId)
-            bucketService.move(picture.url, qiniuConfig.qiniuTempBucket, qiniuConfig.qiniuBucket)
+            bucketService.move(picture.url, qiniuConfig.qiniuTemporaryBucket, qiniuConfig.qiniuPictureBucket)
             pictureService.remove(picture)
         }
         return true
@@ -248,9 +247,9 @@ class PictureController(private val pictureService: PictureService,
 
 
     @Auth
-    @PostMapping("batchUpdate")
+    @PostMapping("batchModified")
     @RestfulPack
-    fun batchUpdate(@CurrentUserInfoId userId: Int, @RequestBody dto: BatchUpdateDto): MutableList<PictureDocument> {
+    fun batchModified(@CurrentUserInfoId userId: Int, @RequestBody dto: BatchUpdateDto): MutableList<PictureDocument> {
         val pictureList = mutableListOf<PictureDocument>()
         for (id in dto.idList) {
             try {

@@ -28,10 +28,8 @@ spring:
 qiniu:
   qiniuAccessKey: 0G397Ly7Z6pqnm2MPUhHIbMFzvBX19yyhu-RdiqI
   qiniuSecretKey: _xLtVKJ4VNUrwSsEGkJBHtV2s6mZ2QG2yDXaCvTk
-  qiniuUrl: http://rs.qiniu.com/move/
+  qiniuHost: rs.qiniu.com
   qiniuTemporaryBucket: temporary
-  qiniuAvatarBucket: head
-  qiniuBackgroundBucket: background
+  qiniuPictureBucket: secdra
   qiniuTemporaryBucketUrl: http://secdratemp.secdra.com
-  qiniuAvatarBucketUrl: http://secdrahead.secdra.com
-  qiniuBackgroundBucketUrl: http://secdraback.secdra.com
+  qiniuPictureBucketUrl: http://secdraimg.secdra.com

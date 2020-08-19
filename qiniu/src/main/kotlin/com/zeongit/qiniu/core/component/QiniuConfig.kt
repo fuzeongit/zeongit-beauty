@@ -21,17 +21,11 @@ class QiniuConfig {
     lateinit var qiniuTemporaryBucket: String
 
     //头像储存空间
-    lateinit var qiniuAvatarBucket: String
-
-    //背景储存空间
-    lateinit var qiniuBackgroundBucket: String
+    lateinit var qiniuPictureBucket: String
 
     //临时储存空间
     lateinit var qiniuTemporaryBucketUrl: String
 
     //头像储存空间
-    lateinit var qiniuAvatarBucketUrl: String
-
-    //背景储存空间
-    lateinit var qiniuBackgroundBucketUrl: String
+    lateinit var qiniuPictureBucketUrl: String
 }
