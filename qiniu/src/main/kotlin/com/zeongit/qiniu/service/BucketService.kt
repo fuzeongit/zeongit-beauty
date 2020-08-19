@@ -1,7 +1,7 @@
 package com.zeongit.qiniu.service
 
 import com.zeongit.qiniu.core.component.QiniuConfig
-import com.zeongit.qiniu.core.util.Auth
+import com.zeongit.qiniu.core.util.QiniuAuth
 import com.zeongit.qiniu.model.QiniuImageInfo
 import com.qiniu.util.UrlSafeBase64
 import org.springframework.http.HttpEntity
@@ -26,13 +26,13 @@ class BucketService(private val qiniuConfig: QiniuConfig) {
      * @param bucket 目标空间
      * @param sourceBucket 源空间
      */
-    fun move(url: String, bucket: String, sourceBucket: String? = qiniuConfig.qiniuTempBucket): Boolean {
+    fun move(url: String, bucket: String, sourceBucket: String): Boolean {
         val sourceNameEncodeBase64 = UrlSafeBase64.encodeToString("$sourceBucket:$url")!!
         val nameEncodeBase64 = UrlSafeBase64.encodeToString("$bucket:$url")!!
 
-        val qiniuUrl = "http://rs.qiniu.com/move/$sourceNameEncodeBase64/$nameEncodeBase64"
+        val qiniuUrl = "http://" + qiniuConfig.qiniuHost + "/move/" + sourceNameEncodeBase64 + "/" + nameEncodeBase64
 
-        val auth = Auth.create(qiniuConfig.qiniuAccessKey, qiniuConfig.qiniuSecretKey)
+        val auth = QiniuAuth.create(qiniuConfig.qiniuAccessKey, qiniuConfig.qiniuSecretKey)
         val authorizationMap = auth.authorization(qiniuUrl, null, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
         val authorization = authorizationMap.get("Authorization") as String
 
@@ -41,9 +41,8 @@ class BucketService(private val qiniuConfig: QiniuConfig) {
         val params = LinkedMultiValueMap<String, String>()
         //  请勿轻易改变此提交方式，大部分的情况下，提交方式都是表单提交
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
-        headers.add("Host", "rs.qiniu.com")
+        headers.add("Host", qiniuConfig.qiniuHost)
         headers.add("Accept", "*/*")
-        headers.add("Content-Type", "application/json")
         headers.add("Authorization", authorization)
         val requestEntity = HttpEntity<MultiValueMap<String, String>>(params, headers)
         try {
@@ -57,7 +56,7 @@ class BucketService(private val qiniuConfig: QiniuConfig) {
     /**
      * 获取图片信息
      */
-    fun getImageInfo(url: String, bucketUrl: String? = qiniuConfig.qiniuBucketUrl): QiniuImageInfo? {
+    fun getImageInfo(url: String, bucketUrl: String): QiniuImageInfo? {
         val client = RestTemplate()
         return client.getForObject("$bucketUrl/$url?imageInfo", QiniuImageInfo::class.java)
     }

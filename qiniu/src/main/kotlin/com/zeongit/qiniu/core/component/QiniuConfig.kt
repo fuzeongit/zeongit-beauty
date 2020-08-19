@@ -14,20 +14,24 @@ class QiniuConfig {
     lateinit var qiniuAccessKey: String
 
     lateinit var qiniuSecretKey: String
+
+    lateinit var qiniuHost: String
+
     //临时储存空间
-    lateinit var qiniuTempBucket: String
+    lateinit var qiniuTemporaryBucket: String
+
     //头像储存空间
-    lateinit var qiniuHeadBucket: String
+    lateinit var qiniuAvatarBucket: String
+
     //背景储存空间
-    lateinit var qiniuBackBucket: String
-    //主储存空间
-    lateinit var qiniuBucket: String
+    lateinit var qiniuBackgroundBucket: String
+
     //临时储存空间
-    lateinit var qiniuTempBucketUrl: String
+    lateinit var qiniuTemporaryBucketUrl: String
+
     //头像储存空间
-    lateinit var qiniuHeadBucketUrl: String
+    lateinit var qiniuAvatarBucketUrl: String
+
     //背景储存空间
-    lateinit var qiniuBackBucketUrl: String
-    //主储存空间
-    lateinit var qiniuBucketUrl: String
+    lateinit var qiniuBackgroundBucketUrl: String
 }
