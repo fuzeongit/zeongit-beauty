@@ -55,7 +55,7 @@ class UserBlackHoleController(
     fun paging(@CurrentUserInfoId userId: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<UserBlackHoleVo> {
         val page = userBlackHoleService.paging(pageable, userId, startDate, endDate)
         val userVoList = page.content.map {
-            val info = getUserVo(it.createdBy!!, userId)
+            val info = getUserVo(it.targetId, userId)
             UserBlackHoleVo(info.id, info.avatarUrl, info.nickname, BlockState.SHIELD)
         }
         return PageImpl(userVoList, page.pageable, page.totalElements)
