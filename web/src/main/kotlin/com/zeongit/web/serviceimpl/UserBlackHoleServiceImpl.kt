@@ -39,6 +39,10 @@ class UserBlackHoleServiceImpl(private val userBlackHoleDao: UserBlackHoleDao) :
         return userBlackHoleDao.findByCreatedByAndTargetId(userId, userId).orElseThrow { NotFoundException("黑名单不存在") }
     }
 
+    override fun exists(userId: Int, targetId: Int): Boolean {
+        return userBlackHoleDao.existsByCreatedByAndTargetId(userId, targetId)
+    }
+
     override fun listBlacklist(userId: Int?): MutableList<Int> {
         val userBlacklist = mutableListOf<Int>()
         if (userId != null) {

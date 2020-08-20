@@ -12,6 +12,8 @@ import java.util.*
 interface PictureBlackHoleDao : JpaRepository<PictureBlackHole, Int>, JpaSpecificationExecutor<PictureBlackHole> {
     fun findByCreatedByAndTargetId(createdBy: Int, targetId: Int): Optional<PictureBlackHole>
 
+    fun existsByCreatedByAndTargetId(createdBy: Int, targetId: Int): Boolean
+
     @Transactional
     fun deleteByCreatedByAndTargetId(createdBy: Int, targetId: Int)
 }

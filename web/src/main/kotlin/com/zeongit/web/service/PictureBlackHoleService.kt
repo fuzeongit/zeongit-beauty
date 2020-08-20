@@ -16,5 +16,7 @@ interface PictureBlackHoleService {
 
     fun get(userId: Int, targetId: Int): PictureBlackHole
 
+    fun exists(userId: Int, targetId: Int): Boolean
+
     fun listBlacklist(userId: Int? = null): MutableList<Int>
 }

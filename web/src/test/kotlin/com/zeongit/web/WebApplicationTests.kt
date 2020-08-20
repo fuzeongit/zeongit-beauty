@@ -8,6 +8,10 @@ class WebApplicationTests {
 
     @Test
     fun contextLoads() {
+
+        val a = listOf("1","2","3")
+        val b = listOf("3","5")
+        println(a.subtract(b))
     }
 
 }

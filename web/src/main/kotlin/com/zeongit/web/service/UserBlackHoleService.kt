@@ -1,6 +1,5 @@
 package com.zeongit.web.service
 
-import com.zeongit.data.database.primary.entity.Footprint
 import com.zeongit.data.database.primary.entity.UserBlackHole
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -16,6 +15,8 @@ interface UserBlackHoleService {
     fun remove(userId: Int, targetId: Int): Boolean
 
     fun get(userId: Int, targetId: Int): UserBlackHole
+
+    fun exists(userId: Int, targetId: Int): Boolean
 
     fun listBlacklist(userId: Int? = null): MutableList<Int>
 }

@@ -44,11 +44,14 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
                         startDate: Date?, endDate: Date?,
                         userId: Int?, self: Boolean,
                         mustUserList: List<Int>?,
-                        userBlacklist: List<Int>?, pictureBlacklist: List<Int>?): Page<PictureDocument> {
+                        userBlacklist: List<Int>?, pictureBlacklist: List<Int>?, tagBlacklist: List<String>?): Page<PictureDocument> {
         val mustQuery = QueryBuilders.boolQuery()
-        if (tagList != null && tagList.isNotEmpty()) {
+        if (tagList != null) {
+            val shrinkTagList = tagBlacklist?.let {
+                tagList.subtract(it)
+            } ?: tagList
             val tagBoolQuery = QueryBuilders.boolQuery()
-            for (tag in tagList) {
+            for (tag in shrinkTagList) {
                 if (precise) {
                     tagBoolQuery.must(QueryBuilders.termQuery("tagList", tag))
                 } else {
@@ -96,6 +99,16 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
             mustQuery.must(pictureBlacklistBoolQuery)
         }
 
+        if (tagBlacklist != null) {
+            val shrinkTagList = tagList?.let {
+                tagBlacklist.subtract(it)
+            } ?: tagBlacklist
+            val tagBoolQuery = QueryBuilders.boolQuery()
+            for (tag in shrinkTagList) {
+                tagBoolQuery.mustNot(QueryBuilders.termQuery("tagList", tag))
+            }
+            mustQuery.must(tagBoolQuery)
+        }
         return pictureDocumentDao.search(mustQuery, pageable)
     }
 

@@ -11,6 +11,8 @@ import java.util.*
 interface UserBlackHoleDao : JpaRepository<UserBlackHole, Int>, JpaSpecificationExecutor<UserBlackHole> {
     fun findByCreatedByAndTargetId(createdBy: Int, targetId: Int): Optional<UserBlackHole>
 
+    fun existsByCreatedByAndTargetId(createdBy: Int, targetId: Int): Boolean
+
     @Transactional
     fun deleteByCreatedByAndTargetId(createdBy: Int, targetId: Int)
 }
