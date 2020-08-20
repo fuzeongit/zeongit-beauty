@@ -70,7 +70,7 @@ class CollectionController(override val pictureDocumentService: PictureDocumentS
             picture.createdBy == userId && throw ProgramException("不能收藏自己的作品")
             val flag = if (collectionService.exists(userId, pictureId) == CollectState.STRANGE) {
                 picture.privacy == PrivacyState.PRIVATE && throw PermissionException("不能收藏私密图片")
-                collectionService.save(userId, pictureId)
+                collectionService.save(pictureId)
                 CollectState.CONCERNED
             } else {
                 collectionService.remove(userId, pictureId)

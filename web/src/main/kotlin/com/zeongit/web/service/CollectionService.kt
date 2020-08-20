@@ -16,7 +16,7 @@ import java.util.*
 interface CollectionService {
     fun exists(userId: Int?, pictureId: Int): CollectState
 
-    fun save(userId: Int, pictureId: Int): Collection
+    fun save(pictureId: Int): Collection
 
     fun remove(userId: Int, pictureId: Int): Boolean
 
