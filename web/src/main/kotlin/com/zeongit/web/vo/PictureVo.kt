@@ -7,7 +7,7 @@ import com.zeongit.data.index.primary.document.PictureDocument
 import org.springframework.beans.BeanUtils
 import java.util.*
 
-class PictureVo {
+class PictureVo() {
     var id: Int = 0
 
     lateinit var introduction: String
@@ -29,6 +29,7 @@ class PictureVo {
     var height: Long = 0
 
     lateinit var sizeType: SizeType
+
     /**
      * 由于es的查询的原因，在空的情况下也有一条空的数据而不是空数组
      */
@@ -40,9 +41,7 @@ class PictureVo {
 
     lateinit var createDate: Date
 
-    constructor()
-
-    constructor(picture: PictureDocument) {
+    constructor(picture: PictureDocument) : this() {
         BeanUtils.copyProperties(picture, this)
     }
 }

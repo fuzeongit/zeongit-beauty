@@ -1,19 +1,14 @@
 package com.zeongit.web.controller
 
-import com.zeongit.data.constant.PrivacyState
-import com.zeongit.data.database.primary.entity.UserBlackHole
+import com.zeongit.data.constant.BlockState
 import com.zeongit.share.annotations.Auth
 import com.zeongit.share.annotations.CurrentUserInfoId
 import com.zeongit.share.annotations.RestfulPack
-import com.zeongit.share.exception.NotFoundException
-import com.zeongit.share.exception.PermissionException
 import com.zeongit.share.exception.ProgramException
-import com.zeongit.share.exception.SignInException
 import com.zeongit.web.core.communal.UserInfoVoAbstract
 import com.zeongit.web.service.FollowService
 import com.zeongit.web.service.UserBlackHoleService
 import com.zeongit.web.service.UserInfoService
-import com.zeongit.web.vo.FootprintPictureVo
 import com.zeongit.web.vo.UserInfoVo
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -39,22 +34,18 @@ class UserBlackHoleController(
     }
 
     @Auth
-    @PostMapping("save")
+    @PostMapping("block")
     @RestfulPack
-    fun save(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): UserBlackHole {
+    fun block(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): BlockState {
         val targetId = dto.targetId
         userId == targetId && throw ProgramException("操作有误")
-        userBlackHoleService.exists(userId, targetId) && throw ProgramException("用户黑名单已存在")
-        return userBlackHoleService.save(targetId)
-    }
-
-    @Auth
-    @PostMapping("remove")
-    @RestfulPack
-    fun remove(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): Boolean {
-        val targetId = dto.targetId
-        userBlackHoleService.exists(userId, targetId) && throw ProgramException("用户黑名单不存在")
-        return userBlackHoleService.remove(userId, targetId)
+        return if (userBlackHoleService.exists(userId, targetId)) {
+            userBlackHoleService.remove(userId, targetId)
+            BlockState.NORMAL
+        } else {
+            userBlackHoleService.save(targetId)
+            BlockState.SHIELD
+        }
     }
 
     @Auth

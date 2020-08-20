@@ -1,5 +1,6 @@
 package com.zeongit.web.controller
 
+import com.zeongit.data.constant.BlockState
 import com.zeongit.data.constant.PrivacyState
 import com.zeongit.data.database.primary.entity.Picture
 import com.zeongit.data.database.primary.entity.Tag
@@ -12,7 +13,7 @@ import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.exception.ProgramException
 import com.zeongit.web.core.communal.PictureVoAbstract
 import com.zeongit.web.service.*
-import com.zeongit.web.vo.PictureVo
+import com.zeongit.web.vo.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -109,7 +110,6 @@ class PictureController(private val pictureService: PictureService,
                 pictureBlacklist = pictureBlackHoleService.listBlacklist(userId),
                 tagBlacklist = tagBlackHoleService.listBlacklist(userId)
         ), userId)
-
     }
 
     /**
@@ -147,6 +147,25 @@ class PictureController(private val pictureService: PictureService,
     @RestfulPack
     fun get(id: Int, @CurrentUserInfoId userId: Int?): PictureVo {
         return getPictureVo(id, userId)
+    }
+
+    /**
+     * 获取屏蔽状态
+     */
+    @Auth
+    @GetMapping("getBlock")
+    @RestfulPack
+    fun getBlock(id: Int, @CurrentUserInfoId userId: Int): BlockVo {
+        val vo = getPictureVo(id, userId)
+        return BlockVo(
+                UserBlockVo(vo.user.id, vo.user.avatarUrl, vo.user.nickname,
+                        if (userBlackHoleService.exists(userId, vo.user.id)) BlockState.SHIELD else BlockState.NORMAL
+                ),
+                vo.tagList.map { TagBlockVo(it, if (tagBlackHoleService.exists(userId, it)) BlockState.SHIELD else BlockState.NORMAL) },
+                PictureBlockVo(vo.id, vo.url, vo.name,
+                        if (pictureBlackHoleService.exists(userId, vo.id)) BlockState.SHIELD else BlockState.NORMAL
+                )
+        )
     }
 
     /**

@@ -1,9 +1,7 @@
 package com.zeongit.web.controller
 
-import com.zeongit.data.constant.CollectState
+import com.zeongit.data.constant.BlockState
 import com.zeongit.data.constant.PrivacyState
-import com.zeongit.data.database.primary.entity.PictureBlackHole
-import com.zeongit.data.database.primary.entity.UserBlackHole
 import com.zeongit.share.annotations.Auth
 import com.zeongit.share.annotations.CurrentUserInfoId
 import com.zeongit.share.annotations.RestfulPack
@@ -12,10 +10,7 @@ import com.zeongit.share.exception.PermissionException
 import com.zeongit.share.exception.ProgramException
 import com.zeongit.web.core.communal.PictureVoAbstract
 import com.zeongit.web.service.*
-import com.zeongit.web.vo.CollectionPictureVo
 import com.zeongit.web.vo.PictureBlackHoleVo
-import com.zeongit.web.vo.PictureVo
-import com.zeongit.web.vo.UserInfoVo
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -42,23 +37,19 @@ class PictureBlackHoleController(
     }
 
     @Auth
-    @PostMapping("save")
+    @PostMapping("block")
     @RestfulPack
-    fun save(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): PictureBlackHole {
+    fun block(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): BlockState {
         val targetId = dto.targetId
-        val picture =  pictureDocumentService.get(targetId)
+        val picture = pictureDocumentService.get(targetId)
         picture.createdBy == userId && throw ProgramException("不能把自己的作品加入黑名单")
-        pictureBlackHoleService.exists(userId, targetId) && throw ProgramException("图片黑名单已存在")
-        return pictureBlackHoleService.save(targetId)
-    }
-
-    @Auth
-    @PostMapping("remove")
-    @RestfulPack
-    fun remove(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): Boolean {
-        val targetId = dto.targetId
-        pictureBlackHoleService.exists(userId, targetId) && throw ProgramException("图片黑名单不存在")
-        return pictureBlackHoleService.remove(userId, targetId)
+        return if (pictureBlackHoleService.exists(userId, targetId)) {
+            pictureBlackHoleService.remove(userId, targetId)
+            BlockState.NORMAL
+        } else {
+            pictureBlackHoleService.save(targetId)
+            BlockState.SHIELD
+        }
     }
 
     @Auth
