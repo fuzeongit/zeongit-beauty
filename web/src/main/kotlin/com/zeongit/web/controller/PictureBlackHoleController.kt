@@ -41,15 +41,30 @@ class PictureBlackHoleController(
     @RestfulPack
     fun block(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): BlockState {
         val targetId = dto.targetId
-        val picture = pictureDocumentService.get(targetId)
-        picture.createdBy == userId && throw ProgramException("不能把自己的作品加入黑名单")
-        return if (pictureBlackHoleService.exists(userId, targetId)) {
-            pictureBlackHoleService.remove(userId, targetId)
-            BlockState.NORMAL
-        } else {
-            pictureBlackHoleService.save(targetId)
-            BlockState.SHIELD
+        val picture = try {
+            pictureDocumentService.get(targetId)
+        } catch (e: NotFoundException) {
+            null
         }
+        return if (picture == null) {
+            //加入了黑名单的图片点击移除
+            if (pictureBlackHoleService.exists(userId, targetId)) {
+                collectionService.remove(userId, targetId)
+                BlockState.NORMAL
+            } else {
+                throw PermissionException("操作有误")
+            }
+        } else {
+            picture.createdBy == userId && throw ProgramException("不能把自己的作品加入黑名单")
+            if (pictureBlackHoleService.exists(userId, targetId)) {
+                pictureBlackHoleService.remove(userId, targetId)
+                BlockState.NORMAL
+            } else {
+                pictureBlackHoleService.save(targetId)
+                BlockState.SHIELD
+            }
+        }
+
     }
 
     @Auth
@@ -62,18 +77,15 @@ class PictureBlackHoleController(
             val pictureBlackHoleVo = try {
                 val picture = pictureDocumentService.get(pictureBlackHole.targetId)
                 //图片被隐藏
-                if (picture.privacy == PrivacyState.PRIVATE) {
-                    picture.url = ""
-                }
-                PictureBlackHoleVo(
-                        picture,
-                        getPictureVo(picture, userId).focus,
-                        pictureBlackHole.createDate!!,
-                        getUserVo(picture.createdBy, userId))
+                PictureBlackHoleVo(pictureBlackHole.targetId,
+                        if (picture.privacy == PrivacyState.PRIVATE) null else picture.url,
+                        picture.name,
+                        BlockState.SHIELD
+                )
             } catch (e: NotFoundException) {
-                PictureBlackHoleVo(pictureBlackHole.targetId, collectionService.exists(userId, pictureBlackHole.targetId), pictureBlackHole.lastModifiedDate!!)
+                PictureBlackHoleVo(pictureBlackHole.targetId, null, null, BlockState.SHIELD)
             } catch (e: PermissionException) {
-                PictureBlackHoleVo(pictureBlackHole.targetId, collectionService.exists(userId, pictureBlackHole.targetId), pictureBlackHole.lastModifiedDate!!)
+                PictureBlackHoleVo(pictureBlackHole.targetId, null, null, BlockState.SHIELD)
             }
             blackList.add(pictureBlackHoleVo)
         }

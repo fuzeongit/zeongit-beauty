@@ -9,6 +9,7 @@ import com.zeongit.web.core.communal.UserInfoVoAbstract
 import com.zeongit.web.service.FollowService
 import com.zeongit.web.service.UserBlackHoleService
 import com.zeongit.web.service.UserInfoService
+import com.zeongit.web.vo.UserBlackHoleVo
 import com.zeongit.web.vo.UserInfoVo
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -51,10 +52,11 @@ class UserBlackHoleController(
     @Auth
     @GetMapping("paging")
     @RestfulPack
-    fun paging(@CurrentUserInfoId userId: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<UserInfoVo> {
+    fun paging(@CurrentUserInfoId userId: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<UserBlackHoleVo> {
         val page = userBlackHoleService.paging(pageable, userId, startDate, endDate)
         val userVoList = page.content.map {
-            getUserVo(it.createdBy!!, userId)
+            val info = getUserVo(it.createdBy!!, userId)
+            UserBlackHoleVo(info.id, info.avatarUrl, info.nickname, BlockState.SHIELD)
         }
         return PageImpl(userVoList, page.pageable, page.totalElements)
     }

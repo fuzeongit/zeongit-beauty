@@ -6,7 +6,9 @@ import com.zeongit.share.annotations.Auth
 import com.zeongit.share.annotations.CurrentUserInfoId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.web.service.TagBlackHoleService
+import com.zeongit.web.vo.TagBlackHoleVo
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
@@ -43,7 +45,11 @@ class TagBlackHoleController(
     @Auth
     @GetMapping("paging")
     @RestfulPack
-    fun paging(@CurrentUserInfoId userId: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<TagBlackHole> {
-        return tagBlackHoleService.paging(pageable, userId, startDate, endDate)
+    fun paging(@CurrentUserInfoId userId: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<TagBlackHoleVo> {
+        val page = tagBlackHoleService.paging(pageable, userId, startDate, endDate)
+        val blackList = page.content.map {
+            TagBlackHoleVo(it.tag, BlockState.SHIELD)
+        }
+        return PageImpl(blackList, page.pageable, page.totalElements)
     }
 }

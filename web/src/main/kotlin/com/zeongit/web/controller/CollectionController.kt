@@ -64,7 +64,7 @@ class CollectionController(override val pictureDocumentService: PictureDocumentS
                 collectionService.remove(userId, pictureId)
                 CollectState.STRANGE
             } else {
-                throw PermissionException("不能收藏已移除图片")
+                throw PermissionException("操作有误")
             }
         } else {
             picture.createdBy == userId && throw ProgramException("不能收藏自己的作品")

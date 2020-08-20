@@ -155,14 +155,14 @@ class PictureController(private val pictureService: PictureService,
     @Auth
     @GetMapping("getBlock")
     @RestfulPack
-    fun getBlock(id: Int, @CurrentUserInfoId userId: Int): BlockVo {
+    fun getBlock(id: Int, @CurrentUserInfoId userId: Int): BlackHoleVo {
         val vo = getPictureVo(id, userId)
-        return BlockVo(
-                UserBlockVo(vo.user.id, vo.user.avatarUrl, vo.user.nickname,
+        return BlackHoleVo(
+                UserBlackHoleVo(vo.user.id, vo.user.avatarUrl, vo.user.nickname,
                         if (userBlackHoleService.exists(userId, vo.user.id)) BlockState.SHIELD else BlockState.NORMAL
                 ),
-                vo.tagList.map { TagBlockVo(it, if (tagBlackHoleService.exists(userId, it)) BlockState.SHIELD else BlockState.NORMAL) },
-                PictureBlockVo(vo.id, vo.url, vo.name,
+                vo.tagList.map { TagBlackHoleVo(it, if (tagBlackHoleService.exists(userId, it)) BlockState.SHIELD else BlockState.NORMAL) },
+                PictureBlackHoleVo(vo.id, vo.url, vo.name,
                         if (pictureBlackHoleService.exists(userId, vo.id)) BlockState.SHIELD else BlockState.NORMAL
                 )
         )
