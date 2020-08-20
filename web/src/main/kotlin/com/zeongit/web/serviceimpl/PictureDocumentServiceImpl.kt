@@ -23,7 +23,8 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
                                  private val footprintService: FootprintService,
                                  private val followService: FollowService,
                                  private val userBlackHoleService: UserBlackHoleService,
-                                 private val pictureBlackHoleService: PictureBlackHoleService
+                                 private val pictureBlackHoleService: PictureBlackHoleService,
+                                 private val tagBlackHoleService: TagBlackHoleService
 ) : PictureDocumentService {
 
     override fun get(id: Int): PictureDocument {
@@ -47,11 +48,8 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
                         userBlacklist: List<Int>?, pictureBlacklist: List<Int>?, tagBlacklist: List<String>?): Page<PictureDocument> {
         val mustQuery = QueryBuilders.boolQuery()
         if (tagList != null) {
-            val shrinkTagList = tagBlacklist?.let {
-                tagList.subtract(it)
-            } ?: tagList
             val tagBoolQuery = QueryBuilders.boolQuery()
-            for (tag in shrinkTagList) {
+            for (tag in tagList) {
                 if (precise) {
                     tagBoolQuery.must(QueryBuilders.termQuery("tagList", tag))
                 } else {
@@ -100,11 +98,8 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
         }
 
         if (tagBlacklist != null) {
-            val shrinkTagList = tagList?.let {
-                tagBlacklist.subtract(it)
-            } ?: tagBlacklist
             val tagBoolQuery = QueryBuilders.boolQuery()
-            for (tag in shrinkTagList) {
+            for (tag in tagBlacklist) {
                 tagBoolQuery.mustNot(QueryBuilders.termQuery("tagList", tag))
             }
             mustQuery.must(tagBoolQuery)
@@ -131,7 +126,9 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
                 startDate = startDate,
                 endDate = startDate,
                 userBlacklist = userBlacklist,
-                pictureBlacklist = pictureBlacklist)
+                pictureBlacklist = pictureBlacklist,
+                tagBlacklist = tagBlackHoleService.listBlacklist(userId)
+        )
     }
 
     override fun pagingRecommendById(pageable: Pageable, id: Int, userId: Int?, startDate: Date?, endDate: Date?): Page<PictureDocument> {
@@ -148,7 +145,9 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
                 startDate = startDate,
                 endDate = startDate,
                 userBlacklist = userBlacklist,
-                pictureBlacklist = pictureBlacklist)
+                pictureBlacklist = pictureBlacklist,
+                tagBlacklist = tagBlackHoleService.listBlacklist(userId)
+        )
     }
 
     override fun pagingByFollowing(pageable: Pageable, userId: Int, startDate: Date?, endDate: Date?): Page<PictureDocument> {
@@ -160,7 +159,8 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
                     startDate = startDate,
                     endDate = startDate,
                     mustUserList = followingList.map { it.followingId },
-                    pictureBlacklist = pictureBlackHoleService.listBlacklist(userId)
+                    pictureBlacklist = pictureBlackHoleService.listBlacklist(userId),
+                    tagBlacklist = tagBlackHoleService.listBlacklist(userId)
             )
         }
     }
@@ -183,7 +183,8 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
                 null, false,
                 listOf(),
                 userBlackHoleService.listBlacklist(userId),
-                pictureBlackHoleService.listBlacklist(userId)
+                pictureBlackHoleService.listBlacklist(userId),
+                tagBlackHoleService.listBlacklist(userId)
         ).content.first()
     }
 

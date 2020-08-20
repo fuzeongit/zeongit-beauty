@@ -32,7 +32,8 @@ class WorksController(override val pictureDocumentService: PictureDocumentServic
                       override val collectionService: CollectionService,
                       override val userInfoService: UserInfoService,
                       override val followService: FollowService,
-                      private val pictureBlackHoleService: PictureBlackHoleService) : PictureVoAbstract() {
+                      private val pictureBlackHoleService: PictureBlackHoleService,
+                      private val tagBlackHoleService: TagBlackHoleService) : PictureVoAbstract() {
     /**
      * 获取列表
      */
@@ -42,7 +43,8 @@ class WorksController(override val pictureDocumentService: PictureDocumentServic
         (userId == null && targetId == null) && throw SignInException("请重新登录")
         return getPageVo(pictureDocumentService.paging(pageable, userId = targetId
                 ?: userId!!, self = targetId == userId,
-                pictureBlacklist = pictureBlackHoleService.listBlacklist(userId)
+                pictureBlacklist = pictureBlackHoleService.listBlacklist(userId),
+                tagBlacklist = tagBlackHoleService.listBlacklist(userId)
         ), userId)
     }
 

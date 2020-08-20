@@ -34,7 +34,8 @@ class PictureController(private val pictureService: PictureService,
                         override val userInfoService: UserInfoService,
                         override val followService: FollowService,
                         private val userBlackHoleService: UserBlackHoleService,
-                        private val pictureBlackHoleService: PictureBlackHoleService
+                        private val pictureBlackHoleService: PictureBlackHoleService,
+                        private val tagBlackHoleService: TagBlackHoleService
 ) : PictureVoAbstract() {
     /**
      * 初始化es
@@ -105,7 +106,10 @@ class PictureController(private val pictureService: PictureService,
                 name,
                 startDate, endDate,
                 userBlacklist = userBlackHoleService.listBlacklist(userId),
-                pictureBlacklist = pictureBlackHoleService.listBlacklist(userId)), userId)
+                pictureBlacklist = pictureBlackHoleService.listBlacklist(userId),
+                tagBlacklist = tagBlackHoleService.listBlacklist(userId)
+        ), userId)
+
     }
 
     /**
