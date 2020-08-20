@@ -28,7 +28,7 @@ interface PictureDocumentService {
 
     fun getFirstByTag(tag: String, userId: Int?): PictureDocument
 
-    fun listTagTop30(): List<String>
+    fun listTagTop30(userId: Int? = null): List<String>
 
     fun save(picture: PictureDocument): PictureDocument
 

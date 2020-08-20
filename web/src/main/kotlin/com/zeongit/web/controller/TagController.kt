@@ -19,14 +19,14 @@ import org.springframework.web.bind.annotation.RestController
 class TagController(private val pictureDocumentService: PictureDocumentService) {
     @GetMapping("listTagTop30")
     @RestfulPack
-    fun listTagTop30(): List<String> {
-        return pictureDocumentService.listTagTop30()
+    fun listTagTop30(@CurrentUserInfoId userId: Int?): List<String> {
+        return pictureDocumentService.listTagTop30(userId)
     }
 
     @GetMapping("listTagAndPictureTop30")
     @RestfulPack
     fun listTagAndPictureTop30(@CurrentUserInfoId userId: Int?): List<TagPictureVo> {
-        val tagList = pictureDocumentService.listTagTop30()
+        val tagList = pictureDocumentService.listTagTop30(userId)
         return tagList.map {
             val picture = pictureDocumentService.getFirstByTag(it, userId)
             TagPictureVo(picture.url, it)

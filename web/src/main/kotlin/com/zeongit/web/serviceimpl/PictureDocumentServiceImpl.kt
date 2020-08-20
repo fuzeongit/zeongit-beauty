@@ -188,10 +188,16 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
         ).content.first()
     }
 
-    override fun listTagTop30(): List<String> {
+    override fun listTagTop30(userId: Int?): List<String> {
+        val tagBlacklist= tagBlackHoleService.listBlacklist(userId)
+        val tagBoolQuery = QueryBuilders.boolQuery()
+        for (tag in tagBlacklist) {
+            tagBoolQuery.mustNot(QueryBuilders.termQuery("tagList", tag))
+        }
         val aggregationBuilders = AggregationBuilders.terms("tagList").field("tagList").size(30).showTermDocCountError(true)
         val query = NativeSearchQueryBuilder()
                 .withIndices("beauty_picture_search")
+                .withQuery(tagBoolQuery)
                 .addAggregation(aggregationBuilders)
                 .build()
         return elasticsearchTemplate.query(query) {
