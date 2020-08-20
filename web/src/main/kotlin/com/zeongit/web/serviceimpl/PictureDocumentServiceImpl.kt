@@ -5,10 +5,7 @@ import com.zeongit.share.util.DateUtil
 import com.zeongit.data.constant.PrivacyState
 import com.zeongit.data.index.primary.dao.PictureDocumentDao
 import com.zeongit.data.index.primary.document.PictureDocument
-import com.zeongit.web.service.CollectionService
-import com.zeongit.web.service.FollowService
-import com.zeongit.web.service.FootprintService
-import com.zeongit.web.service.PictureDocumentService
+import com.zeongit.web.service.*
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.search.aggregations.AggregationBuilders
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms
@@ -24,7 +21,9 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
                                  private val elasticsearchTemplate: ElasticsearchTemplate,
                                  private val collectionService: CollectionService,
                                  private val footprintService: FootprintService,
-                                 private val followService: FollowService
+                                 private val followService: FollowService,
+                                 private val userBlackHoleService: UserBlackHoleService,
+                                 private val pictureBlackHoleService: PictureBlackHoleService
 ) : PictureDocumentService {
 
     override fun get(id: Int): PictureDocument {
@@ -102,11 +101,12 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
 
     override fun pagingByRecommend(pageable: Pageable, userId: Int?, startDate: Date?, endDate: Date?): Page<PictureDocument> {
         val tagList = mutableListOf<String>()
-        val collectionPictureIdList = mutableListOf<Int>()
+        val pictureBlacklist = pictureBlackHoleService.listBlacklist(userId)
+        val userBlacklist = userBlackHoleService.listBlacklist(userId)
         if (userId != null) {
-            val collectionList = collectionService.paging(PageRequest.of(0, 5), userId).content
-            for (collection in collectionList) {
-                collectionPictureIdList.add(collection.pictureId)
+            collectionService.paging(PageRequest.of(0, 5), userId).content.forEach { collection ->
+                //已收藏的图片加入排除列表
+                pictureBlacklist.add(collection.pictureId)
                 try {
                     tagList.addAll(get(collection.pictureId).tagList)
                 } catch (e: NotFoundException) {
@@ -117,20 +117,25 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
                 tagList = tagList,
                 startDate = startDate,
                 endDate = startDate,
-                pictureBlacklist = collectionPictureIdList)
+                userBlacklist = userBlacklist,
+                pictureBlacklist = pictureBlacklist)
     }
 
-    override fun pagingRecommendById(pageable: Pageable, id: Int, startDate: Date?, endDate: Date?): Page<PictureDocument> {
+    override fun pagingRecommendById(pageable: Pageable, id: Int, userId: Int?, startDate: Date?, endDate: Date?): Page<PictureDocument> {
+        val userBlacklist = userBlackHoleService.listBlacklist(userId)
+        val pictureBlacklist = pictureBlackHoleService.listBlacklist(userId)
         val tagList = try {
             get(id).tagList
         } catch (e: Exception) {
             listOf<String>()
         }
+        pictureBlacklist.add(id)
         return paging(pageable = pageable,
                 tagList = tagList,
                 startDate = startDate,
                 endDate = startDate,
-                pictureBlacklist = listOf(id))
+                userBlacklist = userBlacklist,
+                pictureBlacklist = pictureBlacklist)
     }
 
     override fun pagingByFollowing(pageable: Pageable, userId: Int, startDate: Date?, endDate: Date?): Page<PictureDocument> {
@@ -141,7 +146,9 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
             return paging(pageable = pageable,
                     startDate = startDate,
                     endDate = startDate,
-                    mustUserList = followingList.map { it.followingId })
+                    mustUserList = followingList.map { it.followingId },
+                    pictureBlacklist = pictureBlackHoleService.listBlacklist(userId)
+            )
         }
     }
 
@@ -155,12 +162,16 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
         return elasticsearchTemplate.count(searchQuery, PictureDocument::class.java)
     }
 
-    override fun getFirstByTag(tag: String): PictureDocument {
+    override fun getFirstByTag(tag: String, userId: Int?): PictureDocument {
         return paging(
                 PageRequest.of(0, 1, Sort(Sort.Direction.DESC, "likeAmount")),
                 listOf(tag), true, null,
                 null, null,
-                null, false).content.first()
+                null, false,
+                listOf(),
+                userBlackHoleService.listBlacklist(userId),
+                pictureBlackHoleService.listBlacklist(userId)
+        ).content.first()
     }
 
     override fun listTagTop30(): List<String> {

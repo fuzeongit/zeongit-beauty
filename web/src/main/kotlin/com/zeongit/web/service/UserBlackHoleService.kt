@@ -16,4 +16,6 @@ interface UserBlackHoleService {
     fun remove(userId: Int, targetId: Int): Boolean
 
     fun get(userId: Int, targetId: Int): UserBlackHole
+
+    fun listBlacklist(userId: Int? = null): MutableList<Int>
 }

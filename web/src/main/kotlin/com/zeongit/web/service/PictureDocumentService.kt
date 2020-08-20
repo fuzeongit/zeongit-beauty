@@ -22,11 +22,11 @@ interface PictureDocumentService {
 
     fun pagingByFollowing(pageable: Pageable, userId: Int, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
 
-    fun pagingRecommendById(pageable: Pageable, id: Int, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
+    fun pagingRecommendById(pageable: Pageable, id: Int, userId: Int?, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
 
     fun countByTag(tag: String): Long
 
-    fun getFirstByTag(tag: String): PictureDocument
+    fun getFirstByTag(tag: String, userId: Int?): PictureDocument
 
     fun listTagTop30(): List<String>
 

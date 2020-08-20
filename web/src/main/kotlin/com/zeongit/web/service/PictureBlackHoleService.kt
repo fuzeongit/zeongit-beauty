@@ -15,4 +15,6 @@ interface PictureBlackHoleService {
     fun remove(userId: Int, targetId: Int): Boolean
 
     fun get(userId: Int, targetId: Int): PictureBlackHole
+
+    fun listBlacklist(userId: Int? = null): MutableList<Int>
 }

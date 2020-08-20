@@ -32,7 +32,9 @@ class PictureController(private val pictureService: PictureService,
                         override val pictureDocumentService: PictureDocumentService,
                         override val collectionService: CollectionService,
                         override val userInfoService: UserInfoService,
-                        override val followService: FollowService
+                        override val followService: FollowService,
+                        private val userBlackHoleService: UserBlackHoleService,
+                        private val pictureBlackHoleService: PictureBlackHoleService
 ) : PictureVoAbstract() {
     /**
      * 初始化es
@@ -97,7 +99,13 @@ class PictureController(private val pictureService: PictureService,
     @GetMapping("paging")
     @RestfulPack
     fun paging(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, tagList: String?, precise: Boolean?, name: String?, startDate: Date?, endDate: Date?): Page<PictureVo> {
-        return getPageVo(pictureDocumentService.paging(pageable, tagList?.split(" "), precise != null && precise, name, startDate, endDate), userId)
+        return getPageVo(pictureDocumentService.paging(pageable,
+                tagList?.split(" "),
+                precise != null && precise,
+                name,
+                startDate, endDate,
+                userBlacklist = userBlackHoleService.listBlacklist(userId),
+                pictureBlacklist = pictureBlackHoleService.listBlacklist(userId)), userId)
     }
 
     /**
@@ -125,7 +133,7 @@ class PictureController(private val pictureService: PictureService,
     @GetMapping("pagingRecommendById")
     @RestfulPack
     fun pagingRecommendById(@CurrentUserInfoId userId: Int?, id: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureVo> {
-        return getPageVo(pictureDocumentService.pagingRecommendById(pageable, id, startDate, endDate), userId)
+        return getPageVo(pictureDocumentService.pagingRecommendById(pageable, id, userId, startDate, endDate), userId)
     }
 
     /**
@@ -143,8 +151,8 @@ class PictureController(private val pictureService: PictureService,
      */
     @GetMapping("getFirstByTag")
     @RestfulPack
-    fun getFirstByTag(tag: String): PictureVo {
-        return getPictureVo(pictureDocumentService.getFirstByTag(tag))
+    fun getFirstByTag(@CurrentUserInfoId userId: Int?, tag: String): PictureVo {
+        return getPictureVo(pictureDocumentService.getFirstByTag(tag, userId))
     }
 
     /**
@@ -163,7 +171,7 @@ class PictureController(private val pictureService: PictureService,
     @PostMapping("save")
     @RestfulPack
     fun save(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): PictureVo {
-        bucketService.move(dto.url, qiniuConfig.qiniuPictureBucket,qiniuConfig.qiniuTemporaryBucket)
+        bucketService.move(dto.url, qiniuConfig.qiniuPictureBucket, qiniuConfig.qiniuTemporaryBucket)
         val imageInfo = bucketService.getImageInfo(
                 dto.url,
                 qiniuConfig.qiniuPictureBucketUrl

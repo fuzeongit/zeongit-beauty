@@ -11,10 +11,7 @@ import com.zeongit.data.constant.CollectState
 import com.zeongit.data.constant.PrivacyState
 import com.zeongit.data.index.primary.document.PictureDocument
 import com.zeongit.web.core.communal.PictureVoAbstract
-import com.zeongit.web.service.CollectionService
-import com.zeongit.web.service.FollowService
-import com.zeongit.web.service.PictureDocumentService
-import com.zeongit.web.service.UserInfoService
+import com.zeongit.web.service.*
 import com.zeongit.web.vo.CollectionPictureVo
 import com.zeongit.web.vo.PictureVo
 import com.zeongit.web.vo.UserInfoVo
@@ -34,7 +31,8 @@ import java.util.*
 class WorksController(override val pictureDocumentService: PictureDocumentService,
                       override val collectionService: CollectionService,
                       override val userInfoService: UserInfoService,
-                      override val followService: FollowService) : PictureVoAbstract() {
+                      override val followService: FollowService,
+                      private val pictureBlackHoleService: PictureBlackHoleService) : PictureVoAbstract() {
     /**
      * 获取列表
      */
@@ -43,7 +41,9 @@ class WorksController(override val pictureDocumentService: PictureDocumentServic
     fun paging(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, targetId: Int?, startDate: Date?, endDate: Date?): Page<PictureVo> {
         (userId == null && targetId == null) && throw SignInException("请重新登录")
         return getPageVo(pictureDocumentService.paging(pageable, userId = targetId
-                ?: userId!!, self = targetId == userId), userId)
+                ?: userId!!, self = targetId == userId,
+                pictureBlacklist = pictureBlackHoleService.listBlacklist(userId)
+        ), userId)
     }
 
     private fun getPageVo(page: Page<PictureDocument>, userId: Int? = null): Page<PictureVo> {

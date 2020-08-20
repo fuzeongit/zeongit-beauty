@@ -25,10 +25,10 @@ class TagController(private val pictureDocumentService: PictureDocumentService) 
 
     @GetMapping("listTagAndPictureTop30")
     @RestfulPack
-    fun listTagAndPictureTop30(): List<TagPictureVo> {
+    fun listTagAndPictureTop30(@CurrentUserInfoId userId: Int?): List<TagPictureVo> {
         val tagList = pictureDocumentService.listTagTop30()
         return tagList.map {
-            val picture = pictureDocumentService.getFirstByTag(it)
+            val picture = pictureDocumentService.getFirstByTag(it, userId)
             TagPictureVo(picture.url, it)
         }
     }

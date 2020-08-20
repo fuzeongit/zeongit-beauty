@@ -39,6 +39,17 @@ class PictureBlackHoleServiceImpl(private val pictureBlackHoleDao: PictureBlackH
         return pictureBlackHoleDao.findByCreatedByAndTargetId(userId, userId).orElseThrow { NotFoundException("黑名单不存在") }
     }
 
+    override fun listBlacklist(userId: Int?): MutableList<Int> {
+        val pictureBlacklist = mutableListOf<Int>()
+        if (userId != null) {
+            pictureBlacklist.addAll(
+                    list(userId).map { it.targetId }
+            )
+
+        }
+        return pictureBlacklist
+    }
+
     private fun getSpecification(userId: Int, startDate: Date? = null, endDate: Date? = null)
             : Specification<PictureBlackHole> {
         return Specification<PictureBlackHole> { root, _, criteriaBuilder ->
