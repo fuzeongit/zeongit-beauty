@@ -39,7 +39,7 @@ class TagController(private val pictureDocumentService: PictureDocumentService) 
     @RestfulPack
     fun listTagFrequencyByUserId(@CurrentUserInfoId userId: Int?, targetId: Int?): List<TagFrequencyVo> {
         (userId == null && targetId == null) && throw SignInException("请重新登录")
-        return pictureDocumentService.listTagByUserId(userId ?: targetId!!).map {
+        return pictureDocumentService.listTagByUserId(targetId ?: userId!!).map {
             TagFrequencyVo(it.keyAsString, it.docCount)
         }
     }
