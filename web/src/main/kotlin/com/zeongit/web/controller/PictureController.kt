@@ -155,8 +155,8 @@ class PictureController(private val pictureService: PictureService,
      */
     @GetMapping("getFirstByTag")
     @RestfulPack
-    fun getFirstByTag(@CurrentUserInfoId userId: Int?, tag: String): PictureVo {
-        return getPictureVo(pictureDocumentService.getFirstByTag(tag, userId))
+    fun getFirstByTag(@CurrentUserInfoId userId: Int?, name: String): PictureVo {
+        return getPictureVo(pictureDocumentService.getFirstByTag(name, userId))
     }
 
     /**
@@ -164,8 +164,8 @@ class PictureController(private val pictureService: PictureService,
      */
     @GetMapping("countByTag")
     @RestfulPack
-    fun countByTag(tag: String): Long {
-        return pictureDocumentService.countByTag(tag)
+    fun countByTag(name: String): Long {
+        return pictureDocumentService.countByTag(name)
     }
 
     /**

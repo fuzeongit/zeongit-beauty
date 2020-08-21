@@ -6,7 +6,7 @@ class PictureBlackHoleVo(var id: Int, var url: String?, var name: String?, var s
 
 class UserBlackHoleVo(var id: Int, var avatarUrl: String?, var nickname: String, var state: BlockState)
 
-class TagBlackHoleVo(var tag: String, var state: BlockState)
+class TagBlackHoleVo(var name: String, var state: BlockState)
 
 class BlackHoleVo(var user: UserBlackHoleVo,
                   var tagList: List<TagBlackHoleVo>,

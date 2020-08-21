@@ -25,7 +25,7 @@ interface PictureDocumentService {
 
     fun pagingRecommendById(pageable: Pageable, id: Int, userId: Int?, startDate: Date? = null, endDate: Date? = null): Page<PictureDocument>
 
-    fun countByTag(tag: String): Long
+    fun countByTag(name: String): Long
 
     fun getFirstByTag(tag: String, userId: Int?): PictureDocument
 

@@ -25,14 +25,14 @@ class TagBlackHoleController(
         private val tagBlackHoleService: TagBlackHoleService) {
 
     class SaveDto {
-        lateinit var tag: String
+        lateinit var name: String
     }
 
     @Auth
     @PostMapping("block")
     @RestfulPack
     fun block(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): BlockState {
-        val tag = dto.tag
+        val tag = dto.name
         return if (tagBlackHoleService.exists(userId, tag)) {
             tagBlackHoleService.remove(userId, tag)
             BlockState.NORMAL

@@ -1,3 +1,3 @@
 package com.zeongit.web.vo
 
-class TagPictureVo(var url: String, var tag: String, var amount: Long)
+class TagPictureVo(var url: String, var name: String, var amount: Long)

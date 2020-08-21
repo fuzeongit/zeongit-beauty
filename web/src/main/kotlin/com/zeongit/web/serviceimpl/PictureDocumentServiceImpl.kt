@@ -169,10 +169,10 @@ class PictureDocumentServiceImpl(
         }
     }
 
-    override fun countByTag(tag: String): Long {
+    override fun countByTag(name: String): Long {
         val queryBuilder = QueryBuilders
                 .boolQuery()
-                .must(QueryBuilders.termQuery("tagList", tag))
+                .must(QueryBuilders.termQuery("tagList", name))
         val searchQuery = NativeSearchQueryBuilder()
                 .withQuery(queryBuilder)
                 .build()
