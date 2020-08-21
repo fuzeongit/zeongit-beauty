@@ -31,5 +31,5 @@ qiniu:
   qiniuHost: rs.qiniu.com
   qiniuTemporaryBucket: temporary
   qiniuPictureBucket: secdra
-  qiniuTemporaryBucketUrl: http://secdratemp.secdra.com
-  qiniuPictureBucketUrl: http://secdraimg.secdra.com
+  qiniuTemporaryBucketUrl: http://temporary.zeongit.cn
+  qiniuPictureBucketUrl: http://beauty.picture.zeongit.cn

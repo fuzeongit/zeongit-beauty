@@ -30,14 +30,3 @@ spring:
       cluster-name: elasticsearch
   main:
     allow-bean-definition-overriding: true
-qiniu:
-  qiniuAccessKey: 0G397Ly7Z6pqnm2MPUhHIbMFzvBX19yyhu-RdiqI
-  qiniuSecretKey: _xLtVKJ4VNUrwSsEGkJBHtV2s6mZ2QG2yDXaCvTk
-  qiniuTempBucket: temporary
-  qiniuHeadBucket: head
-  qiniuBackBucket: background
-  qiniuBucket: secdra
-  qiniuTempBucketUrl: http://secdratemp.secdra.com
-  qiniuHeadBucketUrl: http://secdrahead.secdra.com
-  qiniuBackBucketUrl: http://secdraback.secdra.com
-  qiniuBucketUrl: http://secdraimg.secdra.com

@@ -9,10 +9,10 @@
   由于网站不是处于正式使用的情况，所以会导致账号丢失情况，所以如果要注册账号请联系作者吧。
   
 #### 快速链接  
-官网：[account.secdra.com](http://account.secdra.com)  
+官网：[Zeongit Beauty](http://beauty.zeongit.cn)  
 
 #### 相关应用
-[Zeongit Beauty](http://beauty.secdra.com/)
+[Zeongit Beauty](http://beauty.zeongit.cn/)
   
 #### 技术栈  
  - Kotlin
