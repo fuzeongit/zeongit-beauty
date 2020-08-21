@@ -4,33 +4,30 @@ import com.zeongit.data.constant.ReadState
 import com.zeongit.share.entity.AskEntity
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.io.Serializable
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.EntityListeners
-import javax.persistence.Table
+import javax.persistence.*
 
 
 /**
- * 反馈消息
+ * 举报图片消息
  * @author fjj
  */
 @Entity
 @EntityListeners(AuditingEntityListener::class)
-@Table(name = "feedback")
-class Feedback() : AskEntity(), Serializable {
+@Table(name = "complaint", uniqueConstraints = [UniqueConstraint(columnNames = arrayOf("created_by", "picture_id"))])
+class Complaint() : AskEntity(), Serializable {
+    //内容
+    @Column(name = "picture_id", columnDefinition = "text")
+    var pictureId: Int = 0
+
     //内容
     @Column(name = "content", columnDefinition = "text")
     lateinit var content: String
 
-    //邮箱
-    @Column(name = "email", length = 32)
-    var email: String? = null
-
     @Column(name = "state")
     var state: ReadState = ReadState.WAIT
 
-    constructor(content: String, email: String?) : this() {
+    constructor(pictureId: Int, content: String) : this() {
+        this.pictureId = pictureId
         this.content = content
-        this.email = email
     }
 }

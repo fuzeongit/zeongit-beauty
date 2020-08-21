@@ -10,5 +10,4 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface FeedbackDao : JpaRepository<Feedback, Int>, JpaSpecificationExecutor<Feedback> {
-    fun findAllByEmail(email: String, pageable: Pageable): Page<Feedback>
 }
