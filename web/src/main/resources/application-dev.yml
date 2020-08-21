@@ -25,6 +25,8 @@ spring:
       cluster-name: elasticsearch
   main:
     allow-bean-definition-overriding: true
+elasticsearch:
+  pictureSearch: beauty_picture_search
 qiniu:
   qiniuAccessKey: 0G397Ly7Z6pqnm2MPUhHIbMFzvBX19yyhu-RdiqI
   qiniuSecretKey: _xLtVKJ4VNUrwSsEGkJBHtV2s6mZ2QG2yDXaCvTk

@@ -1,6 +1,7 @@
 package com.zeongit.web.service
 
 import com.zeongit.data.index.primary.document.PictureDocument
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import java.util.*
@@ -28,7 +29,9 @@ interface PictureDocumentService {
 
     fun getFirstByTag(tag: String, userId: Int?): PictureDocument
 
-    fun listTagTop30(userId: Int? = null): List<String>
+    fun listTagTop30(userId: Int? = null): List<StringTerms.Bucket>
+
+    fun listTagByUserId(userId: Int): List<StringTerms.Bucket>
 
     fun save(picture: PictureDocument): PictureDocument
 

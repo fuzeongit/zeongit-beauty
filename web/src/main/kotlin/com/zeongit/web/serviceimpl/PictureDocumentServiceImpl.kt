@@ -5,9 +5,11 @@ import com.zeongit.share.util.DateUtil
 import com.zeongit.data.constant.PrivacyState
 import com.zeongit.data.index.primary.dao.PictureDocumentDao
 import com.zeongit.data.index.primary.document.PictureDocument
+import com.zeongit.web.core.component.ElasticsearchConfig
 import com.zeongit.web.service.*
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.search.aggregations.AggregationBuilders
+import org.elasticsearch.search.aggregations.BucketOrder
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms
 import org.springframework.data.domain.*
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate
@@ -17,14 +19,16 @@ import java.util.*
 
 
 @Service
-class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocumentDao,
-                                 private val elasticsearchTemplate: ElasticsearchTemplate,
-                                 private val collectionService: CollectionService,
-                                 private val footprintService: FootprintService,
-                                 private val followService: FollowService,
-                                 private val userBlackHoleService: UserBlackHoleService,
-                                 private val pictureBlackHoleService: PictureBlackHoleService,
-                                 private val tagBlackHoleService: TagBlackHoleService
+class PictureDocumentServiceImpl(
+        private val elasticsearchConfig: ElasticsearchConfig,
+        private val pictureDocumentDao: PictureDocumentDao,
+        private val elasticsearchTemplate: ElasticsearchTemplate,
+        private val collectionService: CollectionService,
+        private val footprintService: FootprintService,
+        private val followService: FollowService,
+        private val userBlackHoleService: UserBlackHoleService,
+        private val pictureBlackHoleService: PictureBlackHoleService,
+        private val tagBlackHoleService: TagBlackHoleService
 ) : PictureDocumentService {
 
     override fun get(id: Int): PictureDocument {
@@ -188,23 +192,37 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
         ).content.first()
     }
 
-    override fun listTagTop30(userId: Int?): List<String> {
-        val tagBlacklist= tagBlackHoleService.listBlacklist(userId)
+    override fun listTagTop30(userId: Int?): List<StringTerms.Bucket> {
+        val tagBlacklist = tagBlackHoleService.listBlacklist(userId)
         val tagBoolQuery = QueryBuilders.boolQuery()
+        tagBoolQuery.mustNot(QueryBuilders.termQuery("tagList", ""))
         for (tag in tagBlacklist) {
             tagBoolQuery.mustNot(QueryBuilders.termQuery("tagList", tag))
         }
-        val aggregationBuilders = AggregationBuilders.terms("tagList").field("tagList").size(30).showTermDocCountError(true)
+        val aggregationBuilders = AggregationBuilders.terms("tagListCount").field("tagList").size(30).showTermDocCountError(true)
         val query = NativeSearchQueryBuilder()
-                .withIndices("beauty_picture_search")
+                .withIndices(elasticsearchConfig.pictureSearch)
                 .withQuery(tagBoolQuery)
                 .addAggregation(aggregationBuilders)
                 .build()
         return elasticsearchTemplate.query(query) {
-            it.aggregations.get<StringTerms>("tagList").buckets.map { bucket ->
-                bucket.keyAsString
-            }
-        } ?: listOf()
+            it.aggregations.get<StringTerms>("tagListCount").buckets
+        }
+    }
+
+    override fun listTagByUserId(userId: Int): List<StringTerms.Bucket> {
+        val mustQuery = QueryBuilders.boolQuery()
+        mustQuery.must(QueryBuilders.termQuery("createdBy", userId))
+        mustQuery.mustNot(QueryBuilders.termQuery("tagList", ""))
+        val aggregationBuilders = AggregationBuilders.terms("tagListCount").field("tagList").size(30).showTermDocCountError(true)
+        val query = NativeSearchQueryBuilder()
+                .withIndices(elasticsearchConfig.pictureSearch)
+                .withQuery(mustQuery)
+                .addAggregation(aggregationBuilders)
+                .build()
+        return elasticsearchTemplate.query(query) {
+            it.aggregations.get<StringTerms>("tagListCount").buckets
+        }
     }
 
     override fun save(picture: PictureDocument): PictureDocument {

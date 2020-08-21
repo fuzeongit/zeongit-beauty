@@ -10,7 +10,10 @@ import com.zeongit.share.exception.PermissionException
 import com.zeongit.share.exception.ProgramException
 import com.zeongit.web.core.communal.PictureVoAbstract
 import com.zeongit.web.service.*
+import com.zeongit.web.vo.BlackHoleVo
 import com.zeongit.web.vo.PictureBlackHoleVo
+import com.zeongit.web.vo.TagBlackHoleVo
+import com.zeongit.web.vo.UserBlackHoleVo
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -30,7 +33,9 @@ class PictureBlackHoleController(
         override val collectionService: CollectionService,
         override val userInfoService: UserInfoService,
         override val followService: FollowService,
-        private val pictureBlackHoleService: PictureBlackHoleService) : PictureVoAbstract() {
+        private val userBlackHoleService: UserBlackHoleService,
+        private val pictureBlackHoleService: PictureBlackHoleService,
+        private val tagBlackHoleService: TagBlackHoleService) : PictureVoAbstract() {
 
     class SaveDto {
         var targetId: Int = 0
@@ -65,6 +70,25 @@ class PictureBlackHoleController(
             }
         }
 
+    }
+
+    /**
+     * 获取屏蔽状态
+     */
+    @Auth
+    @GetMapping("get")
+    @RestfulPack
+    fun get(targetId: Int, @CurrentUserInfoId userId: Int): BlackHoleVo {
+        val vo = getPictureVo(targetId, userId)
+        return BlackHoleVo(
+                UserBlackHoleVo(vo.user.id, vo.user.avatarUrl, vo.user.nickname,
+                        if (userBlackHoleService.exists(userId, vo.user.id)) BlockState.SHIELD else BlockState.NORMAL
+                ),
+                vo.tagList.map { TagBlackHoleVo(it, if (tagBlackHoleService.exists(userId, it)) BlockState.SHIELD else BlockState.NORMAL) },
+                PictureBlackHoleVo(vo.id, vo.url, vo.name,
+                        if (pictureBlackHoleService.exists(userId, vo.id)) BlockState.SHIELD else BlockState.NORMAL
+                )
+        )
     }
 
     @Auth

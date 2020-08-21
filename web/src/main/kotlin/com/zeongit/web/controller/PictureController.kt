@@ -150,25 +150,6 @@ class PictureController(private val pictureService: PictureService,
     }
 
     /**
-     * 获取屏蔽状态
-     */
-    @Auth
-    @GetMapping("getBlock")
-    @RestfulPack
-    fun getBlock(id: Int, @CurrentUserInfoId userId: Int): BlackHoleVo {
-        val vo = getPictureVo(id, userId)
-        return BlackHoleVo(
-                UserBlackHoleVo(vo.user.id, vo.user.avatarUrl, vo.user.nickname,
-                        if (userBlackHoleService.exists(userId, vo.user.id)) BlockState.SHIELD else BlockState.NORMAL
-                ),
-                vo.tagList.map { TagBlackHoleVo(it, if (tagBlackHoleService.exists(userId, it)) BlockState.SHIELD else BlockState.NORMAL) },
-                PictureBlackHoleVo(vo.id, vo.url, vo.name,
-                        if (pictureBlackHoleService.exists(userId, vo.id)) BlockState.SHIELD else BlockState.NORMAL
-                )
-        )
-    }
-
-    /**
      * 获取tag第一张
      * 会移到ES搜索
      */
