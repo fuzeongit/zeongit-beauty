@@ -62,7 +62,7 @@ class UserBlackHoleController(
         val vo = getUserVo(targetId, userId)
         return BlackHoleVo(
                 UserBlackHoleVo(targetId, vo.avatarUrl, vo.nickname,
-                        if (userBlackHoleService.exists(targetId, userId)) BlockState.SHIELD else BlockState.NORMAL
+                        if (userBlackHoleService.exists(userId, targetId)) BlockState.SHIELD else BlockState.NORMAL
                 ),
                 pictureDocumentService.listTagByUserId(targetId).map { TagBlackHoleVo(it.keyAsString, if (tagBlackHoleService.exists(userId, it.keyAsString)) BlockState.SHIELD else BlockState.NORMAL) }
         )
