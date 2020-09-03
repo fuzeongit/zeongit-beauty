@@ -99,7 +99,7 @@ class PictureController(
     fun delete(@RequestBody idListDto: IdListDto): Boolean {
         for (id in idListDto.idList) {
             val picture = pictureService.getByLife(id)
-            bucketService.move(picture.url, qiniuConfig.qiniuTempBucket, qiniuConfig.qiniuBucket)
+            bucketService.move(picture.url, qiniuConfig.qiniuTemporaryBucket, qiniuConfig.qiniuPictureBucket)
             pictureService.delete(id)
         }
         return true
