@@ -15,6 +15,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import javax.persistence.EntityManager
+import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
 
@@ -55,3 +56,39 @@ class BeautyDataSourceConfigurer(private val jpaProperties: JpaProperties) {
         return JpaTransactionManager(entityManagerFactoryBeauty(builder, hibernateProperties).`object`!!)
     }
 }
+
+//
+//@Configuration
+//@EnableTransactionManagement
+//@EnableJpaRepositories(
+//        entityManagerFactoryRef = "entityManagerFactoryBeauty",
+//        transactionManagerRef = "transactionManagerBeauty",
+//        basePackages = ["com.zeongit.data.database.primary.dao"]) //设置Repository所在位置
+//class BeautyDataSourceConfigurer {
+//    @Bean
+//    @Qualifier("beautyDataSource")
+//    @ConfigurationProperties(prefix = "spring.datasource.beauty")
+//    fun beautyDataSource(): DataSource {
+//        return DataSourceBuilder.create().build()
+//    }
+//
+//
+//    @Bean
+//    fun entityManagerBeauty(@Qualifier("entityManagerFactoryBeauty") factory: EntityManagerFactory): EntityManager {
+//        return factory.createEntityManager()
+//    }
+//
+//    @Bean
+//    fun entityManagerFactoryBeauty(builder: EntityManagerFactoryBuilder): LocalContainerEntityManagerFactoryBean {
+//        return builder
+//                .dataSource(beautyDataSource())
+//                .packages("com.zeongit.data.database.primary.entity") //当前数据源对应的实体的包名，每个数据源应该有独立的包
+//                .build()
+//    }
+//
+//    @Bean
+//    fun transactionManagerBeauty(
+//            @Qualifier("entityManagerFactoryBeauty") firstEntityManagerFactory: LocalContainerEntityManagerFactoryBean): PlatformTransactionManager {
+//        return JpaTransactionManager(firstEntityManagerFactory.getObject()!!)
+//    }
+//}

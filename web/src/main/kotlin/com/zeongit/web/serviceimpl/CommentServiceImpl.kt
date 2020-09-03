@@ -24,7 +24,7 @@ class CommentServiceImpl(private val commentDao: CommentDao) : CommentService {
     }
 
     override fun listTop4(pictureId: Int): List<Comment> {
-        return commentDao.findAllByPictureId(pictureId, PageRequest.of(0, 4, Sort(Sort.Direction.DESC, "createDate"))).content
+        return commentDao.findAllByPictureId(pictureId, PageRequest.of(0, 4, Sort.by(Sort.Direction.DESC, "createDate"))).content
     }
 
     override fun paging(pageable: Pageable, pictureId: Int): Page<Comment> {

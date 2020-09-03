@@ -181,7 +181,7 @@ class PictureDocumentServiceImpl(
 
     override fun getFirstByTag(tag: String, userId: Int?): PictureDocument {
         return paging(
-                PageRequest.of(0, 1, Sort(Sort.Direction.DESC, "likeAmount")),
+                PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "likeAmount")),
                 listOf(tag), true, null,
                 null, null,
                 null, false,

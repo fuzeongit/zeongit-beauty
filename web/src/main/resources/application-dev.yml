@@ -1,6 +1,14 @@
 server:
   port: 12081
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:13080/eureka/
 spring:
+  application:
+    name: service-zeongit-beauty
   redis:
     host: 127.0.0.1
     port: 6379
