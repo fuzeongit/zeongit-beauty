@@ -1,6 +1,6 @@
 package com.zeongit.web.controller
 
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.exception.SignInException
 import com.zeongit.web.service.FollowService
@@ -27,7 +27,7 @@ class FollowerController(override val userInfoService: UserInfoService, override
      */
     @GetMapping("paging")
     @RestfulPack
-    fun paging(@CurrentUserInfoId followingId: Int?, targetId: Int?, @PageableDefault(value = 20) pageable: Pageable): Page<UserInfoVo> {
+    fun paging(@CurrentUserId followingId: Int?, targetId: Int?, @PageableDefault(value = 20) pageable: Pageable): Page<UserInfoVo> {
         if (followingId == null && targetId == null) throw SignInException("请重新登录")
         val page = followService.pagingByFollowingId(pageable, targetId ?: followingId!!)
         val userVoList = page.content.map {

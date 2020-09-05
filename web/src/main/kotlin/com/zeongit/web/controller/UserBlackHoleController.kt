@@ -2,7 +2,7 @@ package com.zeongit.web.controller
 
 import com.zeongit.data.constant.BlockState
 import com.zeongit.share.annotations.Auth
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.exception.ProgramException
 import com.zeongit.web.core.communal.UserInfoVoAbstract
@@ -40,7 +40,7 @@ class UserBlackHoleController(
     @Auth
     @PostMapping("block")
     @RestfulPack
-    fun block(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): BlockState {
+    fun block(@CurrentUserId userId: Int, @RequestBody dto: SaveDto): BlockState {
         val targetId = dto.targetId
         userId == targetId && throw ProgramException("操作有误")
         return if (userBlackHoleService.exists(userId, targetId)) {
@@ -58,7 +58,7 @@ class UserBlackHoleController(
     @Auth
     @GetMapping("get")
     @RestfulPack
-    fun get(@CurrentUserInfoId userId: Int, targetId: Int): BlackHoleVo {
+    fun get(@CurrentUserId userId: Int, targetId: Int): BlackHoleVo {
         val vo = getUserVo(targetId, userId)
         return BlackHoleVo(
                 UserBlackHoleVo(targetId, vo.avatarUrl, vo.nickname,
@@ -71,7 +71,7 @@ class UserBlackHoleController(
     @Auth
     @GetMapping("paging")
     @RestfulPack
-    fun paging(@CurrentUserInfoId userId: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<UserBlackHoleVo> {
+    fun paging(@CurrentUserId userId: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<UserBlackHoleVo> {
         val page = userBlackHoleService.paging(pageable, userId, startDate, endDate)
         val userVoList = page.content.map {
             val info = getUserVo(it.targetId, userId)

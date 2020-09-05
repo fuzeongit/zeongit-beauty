@@ -3,7 +3,7 @@ package com.zeongit.web.controller
 import com.zeongit.data.constant.BlockState
 import com.zeongit.data.constant.PrivacyState
 import com.zeongit.share.annotations.Auth
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.exception.NotFoundException
 import com.zeongit.share.exception.PermissionException
@@ -44,7 +44,7 @@ class PictureBlackHoleController(
     @Auth
     @PostMapping("block")
     @RestfulPack
-    fun block(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): BlockState {
+    fun block(@CurrentUserId userId: Int, @RequestBody dto: SaveDto): BlockState {
         val targetId = dto.targetId
         val picture = try {
             pictureDocumentService.get(targetId)
@@ -78,7 +78,7 @@ class PictureBlackHoleController(
     @Auth
     @GetMapping("get")
     @RestfulPack
-    fun get(targetId: Int, @CurrentUserInfoId userId: Int): BlackHoleVo {
+    fun get(targetId: Int, @CurrentUserId userId: Int): BlackHoleVo {
         val vo = getPictureVo(targetId, userId)
         return BlackHoleVo(
                 UserBlackHoleVo(vo.user.id, vo.user.avatarUrl, vo.user.nickname,
@@ -94,7 +94,7 @@ class PictureBlackHoleController(
     @Auth
     @GetMapping("paging")
     @RestfulPack
-    fun paging(@CurrentUserInfoId userId: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureBlackHoleVo> {
+    fun paging(@CurrentUserId userId: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureBlackHoleVo> {
         val page = pictureBlackHoleService.paging(pageable, userId, startDate, endDate)
         val blackList = ArrayList<PictureBlackHoleVo>()
         for (pictureBlackHole in page.content) {

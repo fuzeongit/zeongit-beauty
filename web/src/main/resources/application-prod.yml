@@ -1,6 +1,14 @@
 server:
   port: 12081
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:13080/eureka/
 spring:
+  application:
+    name: zeongit-beauty
   redis:
     host: 127.0.0.1
     port: 6379
@@ -8,11 +16,6 @@ spring:
     beauty:
       driver-class-name: com.mysql.jdbc.Driver
       jdbc-url: jdbc:mysql://127.0.0.1:3306/beauty?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8
-      username: root
-      password: ASDasd+-*/00
-    account:
-      driver-class-name: com.mysql.jdbc.Driver
-      jdbc-url: jdbc:mysql://127.0.0.1:3306/zeongit_account?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8
       username: root
       password: ASDasd+-*/00
   jpa:

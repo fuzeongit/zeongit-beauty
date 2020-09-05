@@ -1,6 +1,6 @@
 package com.zeongit.web.controller
 
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.exception.SignInException
 import com.zeongit.web.service.PictureDocumentService
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 class TagController(private val pictureDocumentService: PictureDocumentService) {
     @GetMapping("listTagTop30")
     @RestfulPack
-    fun listTagTop30(@CurrentUserInfoId userId: Int?): List<TagFrequencyVo> {
+    fun listTagTop30(@CurrentUserId userId: Int?): List<TagFrequencyVo> {
         return pictureDocumentService.listTagTop30(userId).map {
             TagFrequencyVo(it.keyAsString, it.docCount)
         }
@@ -27,7 +27,7 @@ class TagController(private val pictureDocumentService: PictureDocumentService) 
 
     @GetMapping("listTagAndPictureTop30")
     @RestfulPack
-    fun listTagAndPictureTop30(@CurrentUserInfoId userId: Int?): List<TagPictureVo> {
+    fun listTagAndPictureTop30(@CurrentUserId userId: Int?): List<TagPictureVo> {
         val tagList = pictureDocumentService.listTagTop30(userId)
         return tagList.map {
             val picture = pictureDocumentService.getFirstByTag(it.keyAsString, userId)
@@ -37,7 +37,7 @@ class TagController(private val pictureDocumentService: PictureDocumentService) 
 
     @GetMapping("listTagFrequencyByUserId")
     @RestfulPack
-    fun listTagFrequencyByUserId(@CurrentUserInfoId userId: Int?, targetId: Int?): List<TagFrequencyVo> {
+    fun listTagFrequencyByUserId(@CurrentUserId userId: Int?, targetId: Int?): List<TagFrequencyVo> {
         (userId == null && targetId == null) && throw SignInException("请重新登录")
         return pictureDocumentService.listTagByUserId(targetId ?: userId!!).map {
             TagFrequencyVo(it.keyAsString, it.docCount)

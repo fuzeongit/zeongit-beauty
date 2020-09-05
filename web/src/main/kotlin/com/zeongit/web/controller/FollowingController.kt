@@ -1,7 +1,7 @@
 package com.zeongit.web.controller
 
 import com.zeongit.share.annotations.Auth
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.exception.ProgramException
 import com.zeongit.share.exception.SignInException
@@ -47,7 +47,7 @@ class FollowingController(private val followMessageService: FollowMessageService
     @Auth
     @PostMapping("focus")
     @RestfulPack
-    fun focus(@CurrentUserInfoId followerId: Int, @RequestBody dto: FocusDto): FollowState {
+    fun focus(@CurrentUserId followerId: Int, @RequestBody dto: FocusDto): FollowState {
         val followingId = dto.followingId
         if (followerId == followingId) {
             throw ProgramException("不能关注自己")
@@ -71,7 +71,7 @@ class FollowingController(private val followMessageService: FollowMessageService
     @Auth
     @PostMapping("unFocus")
     @RestfulPack
-    fun unFocus(@CurrentUserInfoId followerId: Int, @RequestBody() dto: UnFocusDto): Boolean {
+    fun unFocus(@CurrentUserId followerId: Int, @RequestBody() dto: UnFocusDto): Boolean {
         for (followingId in dto.followingIdList!!) {
             try {
                 followService.remove(followerId, followingId)
@@ -86,7 +86,7 @@ class FollowingController(private val followMessageService: FollowMessageService
      */
     @GetMapping("paging")
     @RestfulPack
-    fun paging(@CurrentUserInfoId followerId: Int?, targetId: Int?, @PageableDefault(value = 20) pageable: Pageable): Page<UserInfoVo> {
+    fun paging(@CurrentUserId followerId: Int?, targetId: Int?, @PageableDefault(value = 20) pageable: Pageable): Page<UserInfoVo> {
         if (followerId == null && targetId == null) throw SignInException("请重新登录")
         val page = followService.pagingByFollowerId(pageable, targetId ?: followerId!!)
         val userVoList = page.content.map {

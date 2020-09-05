@@ -1,7 +1,7 @@
 package com.zeongit.web.controller
 
 import com.zeongit.share.annotations.Auth
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.exception.NotFoundException
 import com.zeongit.share.exception.PermissionException
@@ -37,7 +37,7 @@ class FootprintController(private val footprintService: FootprintService,
     @Auth
     @PostMapping("save")
     @RestfulPack
-    fun save(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): Long {
+    fun save(@CurrentUserId userId: Int, @RequestBody dto: SaveDto): Long {
         val pictureId = dto.pictureId
         val picture = pictureDocumentService.get(pictureId)
         picture.privacy == PrivacyState.PRIVATE && throw PermissionException("私有图片不能操作")
@@ -54,7 +54,7 @@ class FootprintController(private val footprintService: FootprintService,
 
     @GetMapping("paging")
     @RestfulPack
-    fun paging(@CurrentUserInfoId userId: Int?, targetId: Int?, @PageableDefault(value = 20) pageable: Pageable): Page<FootprintPictureVo> {
+    fun paging(@CurrentUserId userId: Int?, targetId: Int?, @PageableDefault(value = 20) pageable: Pageable): Page<FootprintPictureVo> {
         (userId == null && targetId == null) && throw SignInException("请重新登录")
         val page = footprintService.paging(pageable, targetId ?: userId!!)
         val footprintPictureVoList = ArrayList<FootprintPictureVo>()
@@ -83,7 +83,7 @@ class FootprintController(private val footprintService: FootprintService,
 
     @GetMapping("pagingUser")
     @RestfulPack
-    fun pagingUser(@CurrentUserInfoId userId: Int?, pictureId: Int, @PageableDefault(value = 20) pageable: Pageable): Page<UserInfoVo> {
+    fun pagingUser(@CurrentUserId userId: Int?, pictureId: Int, @PageableDefault(value = 20) pageable: Pageable): Page<UserInfoVo> {
         val page = footprintService.pagingByPictureId(pageable, pictureId)
         val userVoList = page.content.map {
             getUserVo(it.createdBy!!, userId)

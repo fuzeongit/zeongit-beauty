@@ -1,7 +1,7 @@
 package com.zeongit.web.controller
 
 import com.zeongit.share.annotations.Auth
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.data.database.primary.entity.Reply
 import com.zeongit.data.database.primary.entity.ReplyMessage
@@ -36,7 +36,7 @@ class ReplyController(private val replyService: ReplyService,
     @Auth
     @PostMapping("save")
     @RestfulPack
-    fun save(@CurrentUserInfoId answererId: Int, @RequestBody dto: SaveDto): ReplyVo {
+    fun save(@CurrentUserId answererId: Int, @RequestBody dto: SaveDto): ReplyVo {
         dto.content.isEmpty() && throw Exception("回复不能为空")
         val reply = Reply(dto.commentId, dto.authorId, dto.criticId, dto.pictureId, dto.content)
         val vo = ReplyVo(replyService.save(reply), getUserVo(dto.criticId, answererId), getUserVo(answererId, answererId))
@@ -51,7 +51,7 @@ class ReplyController(private val replyService: ReplyService,
      */
     @GetMapping("list")
     @RestfulPack
-    fun list(@CurrentUserInfoId userId: Int, commentId: Int): List<ReplyVo> {
+    fun list(@CurrentUserId userId: Int, commentId: Int): List<ReplyVo> {
         return replyService.list(commentId).map {
             ReplyVo(it, getUserVo(it.criticId, userId), getUserVo(it.createdBy!!, userId))
         }

@@ -1,7 +1,7 @@
 package com.zeongit.web.controller
 
 import com.zeongit.share.annotations.Auth
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.exception.NotFoundException
 import com.zeongit.share.exception.PermissionException
@@ -51,7 +51,7 @@ class CollectionController(override val pictureDocumentService: PictureDocumentS
     @Auth
     @PostMapping("focus")
     @RestfulPack
-    fun focus(@CurrentUserInfoId userId: Int, @RequestBody dto: FocusDto): CollectState {
+    fun focus(@CurrentUserId userId: Int, @RequestBody dto: FocusDto): CollectState {
         val pictureId = dto.pictureId
         val picture = try {
             pictureDocumentService.get(pictureId)
@@ -87,7 +87,7 @@ class CollectionController(override val pictureDocumentService: PictureDocumentS
     @Auth
     @PostMapping("unFocus")
     @RestfulPack
-    fun unFocus(@CurrentUserInfoId userId: Int, @RequestBody dto: UnFocusDto): List<Int> {
+    fun unFocus(@CurrentUserId userId: Int, @RequestBody dto: UnFocusDto): List<Int> {
         val pictureIdList = dto.pictureIdList!!
         val newPictureIdList = mutableListOf<Int>()
         for (pictureId in pictureIdList) {
@@ -113,7 +113,7 @@ class CollectionController(override val pictureDocumentService: PictureDocumentS
      */
     @GetMapping("paging")
     @RestfulPack
-    fun paging(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, targetId: Int?, startDate: Date?, endDate: Date?): Page<CollectionPictureVo> {
+    fun paging(@CurrentUserId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, targetId: Int?, startDate: Date?, endDate: Date?): Page<CollectionPictureVo> {
         (userId == null && targetId == null) && throw SignInException("请重新登录")
         val page = collectionService.paging(pageable, targetId ?: userId!!, startDate, endDate)
         val collectionPictureVoList = ArrayList<CollectionPictureVo>()
@@ -141,7 +141,7 @@ class CollectionController(override val pictureDocumentService: PictureDocumentS
 
     @GetMapping("pagingUser")
     @RestfulPack
-    fun pagingUser(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, pictureId: Int): Page<UserInfoVo> {
+    fun pagingUser(@CurrentUserId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, pictureId: Int): Page<UserInfoVo> {
         val page = collectionService.pagingByPictureId(pageable, pictureId)
         val userVoList = page.content.map {
             getUserVo(it.createdBy!!, userId)

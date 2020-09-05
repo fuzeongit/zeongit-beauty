@@ -1,7 +1,6 @@
 package com.zeongit.web.core.communal
 
-
-import com.zeongit.share.database.account.entity.UserInfo
+import com.zeongit.share.feign.account.vo.UserInfo
 import com.zeongit.web.service.FollowService
 import com.zeongit.web.service.UserInfoService
 import com.zeongit.web.vo.UserInfoVo

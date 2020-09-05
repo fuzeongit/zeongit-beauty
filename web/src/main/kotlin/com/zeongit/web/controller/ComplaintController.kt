@@ -1,6 +1,6 @@
 package com.zeongit.web.controller
 
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.data.database.primary.entity.Complaint
 import com.zeongit.share.annotations.Auth
@@ -31,7 +31,7 @@ class ComplaintController(private val complaintService: ComplaintService) {
     @Auth
     @PostMapping("save")
     @RestfulPack
-    fun save(@CurrentUserInfoId userId: Int?, @RequestBody dto: SaveDto): Complaint {
+    fun save(@CurrentUserId userId: Int?, @RequestBody dto: SaveDto): Complaint {
         complaintService.exists(userId, dto.pictureId) && throw ProgramException("您已举报该图片")
         return complaintService.save(Complaint(dto.pictureId, dto.content))
     }

@@ -1,7 +1,7 @@
 package com.zeongit.web.controller
 
 import com.zeongit.share.annotations.Auth
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.data.constant.MessageType
 import com.zeongit.data.database.primary.entity.CommentMessage
@@ -33,7 +33,7 @@ class MessageController(private val commentMessageService: CommentMessageService
     @Auth
     @GetMapping("count")
     @RestfulPack
-    fun count(@CurrentUserInfoId userId: Int, messageType: MessageType?): HashMap<MessageType, Long> {
+    fun count(@CurrentUserId userId: Int, messageType: MessageType?): HashMap<MessageType, Long> {
         val vo = HashMap<MessageType, Long>()
         vo[MessageType.COMMENT] = commentMessageService.countUnread(userId)
         vo[MessageType.REPLY] = replyMessageService.countUnread(userId)
@@ -45,7 +45,7 @@ class MessageController(private val commentMessageService: CommentMessageService
     @Auth
     @GetMapping("listUnread")
     @RestfulPack
-    fun listUnread(@CurrentUserInfoId userId: Int, messageType: MessageType): List<Any> {
+    fun listUnread(@CurrentUserId userId: Int, messageType: MessageType): List<Any> {
         if (messageType == MessageType.COMMENT) {
             return getCommentMessageListVo(commentMessageService.listUnread(userId))
         }
@@ -64,7 +64,7 @@ class MessageController(private val commentMessageService: CommentMessageService
     @Auth
     @GetMapping("list")
     @RestfulPack
-    fun list(@CurrentUserInfoId userId: Int, messageType: MessageType): List<Any> {
+    fun list(@CurrentUserId userId: Int, messageType: MessageType): List<Any> {
         if (messageType == MessageType.COMMENT) {
             return getCommentMessageListVo(commentMessageService.list(userId))
         }
@@ -89,7 +89,7 @@ class MessageController(private val commentMessageService: CommentMessageService
     @Auth
     @GetMapping("getSettings")
     @RestfulPack
-    fun getSettings(@CurrentUserInfoId userId: Int): MessageSettings {
+    fun getSettings(@CurrentUserId userId: Int): MessageSettings {
         return try {
             messageSettingsService.get(userId)
         } catch (e: Exception) {
@@ -101,7 +101,7 @@ class MessageController(private val commentMessageService: CommentMessageService
     @Auth
     @PostMapping("saveSettings")
     @RestfulPack
-    fun saveSettings(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): MessageSettings {
+    fun saveSettings(@CurrentUserId userId: Int, @RequestBody dto: SaveDto): MessageSettings {
         val messageSettings = messageSettingsService.get(userId)
         messageSettings.commentStatus = dto.commentStatus
         messageSettings.replyStatus = dto.replyStatus

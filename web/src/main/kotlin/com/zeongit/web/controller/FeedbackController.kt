@@ -1,6 +1,6 @@
 package com.zeongit.web.controller
 
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.data.database.primary.entity.Feedback
 import com.zeongit.web.service.FeedbackService
@@ -28,7 +28,7 @@ class FeedbackController(private val feedbackService: FeedbackService) {
      */
     @PostMapping("save")
     @RestfulPack
-    fun save(@CurrentUserInfoId userId: Int?, @RequestBody dto: SaveDto): Feedback {
+    fun save(@CurrentUserId userId: Int?, @RequestBody dto: SaveDto): Feedback {
         return feedbackService.save(Feedback(dto.content, dto.email))
     }
 }

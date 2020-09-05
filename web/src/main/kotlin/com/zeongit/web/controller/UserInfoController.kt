@@ -1,7 +1,7 @@
 package com.zeongit.web.controller
 
 
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.exception.SignInException
 import com.zeongit.web.core.communal.UserInfoVoAbstract
@@ -22,7 +22,7 @@ class UserInfoController(override val userInfoService: UserInfoService,
      */
     @GetMapping("get")
     @RestfulPack
-    fun get(@CurrentUserInfoId id: Int?, targetId: Int?): UserInfoVo {
+    fun get(@CurrentUserId id: Int?, targetId: Int?): UserInfoVo {
         (id == null && targetId == null) && throw SignInException("请重新登录")
         return getUserVo(targetId ?: id!!, id)
     }

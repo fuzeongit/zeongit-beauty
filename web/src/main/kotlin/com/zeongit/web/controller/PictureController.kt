@@ -8,7 +8,7 @@ import com.zeongit.data.index.primary.document.PictureDocument
 import com.zeongit.qiniu.core.component.QiniuConfig
 import com.zeongit.qiniu.service.BucketService
 import com.zeongit.share.annotations.Auth
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.exception.ProgramException
 import com.zeongit.web.core.communal.PictureVoAbstract
@@ -100,7 +100,7 @@ class PictureController(private val pictureService: PictureService,
      */
     @GetMapping("paging")
     @RestfulPack
-    fun paging(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, tagList: String?, precise: Boolean?, name: String?, startDate: Date?, endDate: Date?): Page<PictureVo> {
+    fun paging(@CurrentUserId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, tagList: String?, precise: Boolean?, name: String?, startDate: Date?, endDate: Date?): Page<PictureVo> {
         return getPageVo(pictureDocumentService.paging(pageable,
                 tagList?.split(" "),
                 precise != null && precise,
@@ -117,7 +117,7 @@ class PictureController(private val pictureService: PictureService,
      */
     @GetMapping("pagingByRecommend")
     @RestfulPack
-    fun pagingByRecommend(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureVo> {
+    fun pagingByRecommend(@CurrentUserId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureVo> {
         return getPageVo(pictureDocumentService.pagingByRecommend(pageable, userId, startDate, endDate), userId)
     }
 
@@ -127,7 +127,7 @@ class PictureController(private val pictureService: PictureService,
      */
     @GetMapping("pagingByFollowing")
     @RestfulPack
-    fun pagingByFollowing(@CurrentUserInfoId userId: Int, pageable: Pageable): Page<PictureVo> {
+    fun pagingByFollowing(@CurrentUserId userId: Int, pageable: Pageable): Page<PictureVo> {
         return getPageVo(pictureDocumentService.pagingByFollowing(pageable, userId), userId)
     }
 
@@ -136,7 +136,7 @@ class PictureController(private val pictureService: PictureService,
      */
     @GetMapping("pagingRecommendById")
     @RestfulPack
-    fun pagingRecommendById(@CurrentUserInfoId userId: Int?, id: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureVo> {
+    fun pagingRecommendById(@CurrentUserId userId: Int?, id: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<PictureVo> {
         return getPageVo(pictureDocumentService.pagingRecommendById(pageable, id, userId, startDate, endDate), userId)
     }
 
@@ -145,7 +145,7 @@ class PictureController(private val pictureService: PictureService,
      */
     @GetMapping("get")
     @RestfulPack
-    fun get(id: Int, @CurrentUserInfoId userId: Int?): PictureVo {
+    fun get(id: Int, @CurrentUserId userId: Int?): PictureVo {
         return getPictureVo(id, userId)
     }
 
@@ -155,7 +155,7 @@ class PictureController(private val pictureService: PictureService,
      */
     @GetMapping("getFirstByTag")
     @RestfulPack
-    fun getFirstByTag(@CurrentUserInfoId userId: Int?, name: String): PictureVo {
+    fun getFirstByTag(@CurrentUserId userId: Int?, name: String): PictureVo {
         return getPictureVo(pictureDocumentService.getFirstByTag(name, userId))
     }
 
@@ -174,7 +174,7 @@ class PictureController(private val pictureService: PictureService,
     @Auth
     @PostMapping("save")
     @RestfulPack
-    fun save(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): PictureVo {
+    fun save(@CurrentUserId userId: Int, @RequestBody dto: SaveDto): PictureVo {
         bucketService.move(dto.url, qiniuConfig.qiniuPictureBucket, qiniuConfig.qiniuTemporaryBucket)
         val imageInfo = bucketService.getImageInfo(
                 dto.url,
@@ -198,7 +198,7 @@ class PictureController(private val pictureService: PictureService,
     @Auth
     @PostMapping("modified")
     @RestfulPack
-    fun modified(@CurrentUserInfoId userId: Int, @RequestBody dto: UpdateDto): PictureVo {
+    fun modified(@CurrentUserId userId: Int, @RequestBody dto: UpdateDto): PictureVo {
         val picture = pictureService.getSelf(dto.id, userId)
         picture.name = dto.name ?: picture.name
         picture.introduction = dto.introduction ?: picture.introduction
@@ -225,7 +225,7 @@ class PictureController(private val pictureService: PictureService,
     @Auth
     @PostMapping("hide")
     @RestfulPack
-    fun hide(@CurrentUserInfoId userId: Int, @RequestBody dto: HideDto): PrivacyState {
+    fun hide(@CurrentUserId userId: Int, @RequestBody dto: HideDto): PrivacyState {
         val picture = pictureService.getSelf(dto.id, userId)
         return pictureService.hide(picture)
     }
@@ -236,7 +236,7 @@ class PictureController(private val pictureService: PictureService,
     @Auth(true)
     @PostMapping("remove")
     @RestfulPack
-    fun remove(@CurrentUserInfoId userId: Int, @RequestBody dto: RemoveDto): Boolean {
+    fun remove(@CurrentUserId userId: Int, @RequestBody dto: RemoveDto): Boolean {
         val picture = pictureService.getSelf(dto.id, userId)
         return pictureService.remove(picture)
     }
@@ -247,7 +247,7 @@ class PictureController(private val pictureService: PictureService,
     @Auth(true)
     @PostMapping("batchRemove")
     @RestfulPack
-    fun batchRemove(@CurrentUserInfoId userId: Int, @RequestBody dto: BatchRemoveDto): Boolean {
+    fun batchRemove(@CurrentUserId userId: Int, @RequestBody dto: BatchRemoveDto): Boolean {
         for (id in dto.idList) {
             val picture = pictureService.getSelf(id, userId)
             bucketService.move(picture.url, qiniuConfig.qiniuTemporaryBucket, qiniuConfig.qiniuPictureBucket)
@@ -260,7 +260,7 @@ class PictureController(private val pictureService: PictureService,
     @Auth
     @PostMapping("batchModified")
     @RestfulPack
-    fun batchModified(@CurrentUserInfoId userId: Int, @RequestBody dto: BatchUpdateDto): MutableList<PictureDocument> {
+    fun batchModified(@CurrentUserId userId: Int, @RequestBody dto: BatchUpdateDto): MutableList<PictureDocument> {
         val pictureList = mutableListOf<PictureDocument>()
         for (id in dto.idList) {
             try {

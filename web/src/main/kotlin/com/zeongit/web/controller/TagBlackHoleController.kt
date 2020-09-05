@@ -3,7 +3,7 @@ package com.zeongit.web.controller
 import com.zeongit.data.constant.BlockState
 import com.zeongit.data.database.primary.entity.TagBlackHole
 import com.zeongit.share.annotations.Auth
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.web.service.TagBlackHoleService
 import com.zeongit.web.vo.TagBlackHoleVo
@@ -31,7 +31,7 @@ class TagBlackHoleController(
     @Auth
     @PostMapping("block")
     @RestfulPack
-    fun block(@CurrentUserInfoId userId: Int, @RequestBody dto: SaveDto): BlockState {
+    fun block(@CurrentUserId userId: Int, @RequestBody dto: SaveDto): BlockState {
         val tag = dto.name
         return if (tagBlackHoleService.exists(userId, tag)) {
             tagBlackHoleService.remove(userId, tag)
@@ -45,7 +45,7 @@ class TagBlackHoleController(
     @Auth
     @GetMapping("paging")
     @RestfulPack
-    fun paging(@CurrentUserInfoId userId: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<TagBlackHoleVo> {
+    fun paging(@CurrentUserId userId: Int, @PageableDefault(value = 20) pageable: Pageable, startDate: Date?, endDate: Date?): Page<TagBlackHoleVo> {
         val page = tagBlackHoleService.paging(pageable, userId, startDate, endDate)
         val blackList = page.content.map {
             TagBlackHoleVo(it.tag, BlockState.SHIELD)

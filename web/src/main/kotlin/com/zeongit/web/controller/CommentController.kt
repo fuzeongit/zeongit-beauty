@@ -1,7 +1,7 @@
 package com.zeongit.web.controller
 
 import com.zeongit.share.annotations.Auth
-import com.zeongit.share.annotations.CurrentUserInfoId
+import com.zeongit.share.annotations.CurrentUserId
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.data.database.primary.entity.Comment
 import com.zeongit.data.database.primary.entity.CommentMessage
@@ -40,7 +40,7 @@ class CommentController(private val commentService: CommentService,
     @Auth
     @PostMapping("save")
     @RestfulPack
-    fun save(@CurrentUserInfoId criticId: Int, @RequestBody dto: SaveDto): CommentVo {
+    fun save(@CurrentUserId criticId: Int, @RequestBody dto: SaveDto): CommentVo {
         val comment = Comment(dto.authorId, dto.pictureId, dto.content)
         val vo = CommentVo(
                 commentService.save(comment),
@@ -58,7 +58,7 @@ class CommentController(private val commentService: CommentService,
      */
     @GetMapping("listTop4")
     @RestfulPack
-    fun listTop4(@CurrentUserInfoId userId: Int?, pictureId: Int): List<CommentVo> {
+    fun listTop4(@CurrentUserId userId: Int?, pictureId: Int): List<CommentVo> {
         return getListVo(commentService.listTop4(pictureId), userId)
     }
 
@@ -67,7 +67,7 @@ class CommentController(private val commentService: CommentService,
      */
     @GetMapping("list")
     @RestfulPack
-    fun list(@CurrentUserInfoId userId: Int?, pictureId: Int): List<CommentVo> {
+    fun list(@CurrentUserId userId: Int?, pictureId: Int): List<CommentVo> {
         return getListVo(commentService.list(pictureId), userId)
     }
 
@@ -76,7 +76,7 @@ class CommentController(private val commentService: CommentService,
      */
     @GetMapping("pagingByPictureId")
     @RestfulPack
-    fun pagingByPictureId(@CurrentUserInfoId userId: Int?, pictureId: Int, @PageableDefault(value = 20) pageable: Pageable): Page<CommentVo> {
+    fun pagingByPictureId(@CurrentUserId userId: Int?, pictureId: Int, @PageableDefault(value = 20) pageable: Pageable): Page<CommentVo> {
         return getPageVo(commentService.paging(pageable, pictureId), userId)
     }
 

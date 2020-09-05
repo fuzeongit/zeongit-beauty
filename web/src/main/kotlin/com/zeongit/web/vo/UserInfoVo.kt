@@ -1,8 +1,8 @@
 package com.zeongit.web.vo
 
 import com.zeongit.data.constant.FollowState
-import com.zeongit.share.enum.Gender
-import com.zeongit.share.database.account.entity.UserInfo
+import com.zeongit.share.feign.account.constant.Gender
+import com.zeongit.share.feign.account.vo.UserInfo
 import org.springframework.beans.BeanUtils
 import java.util.*
 
