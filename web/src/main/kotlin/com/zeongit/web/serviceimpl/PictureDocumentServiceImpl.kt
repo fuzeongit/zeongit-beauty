@@ -62,8 +62,14 @@ class PictureDocumentServiceImpl(
             }
             mustQuery.must(tagBoolQuery)
         }
-        if (!name.isNullOrEmpty())
-            mustQuery.must(QueryBuilders.matchPhraseQuery("name", name))
+        if (!name.isNullOrEmpty()){
+            if (precise) {
+                mustQuery.must(QueryBuilders.termQuery("name", name))
+            } else {
+                mustQuery.must(QueryBuilders.matchPhraseQuery("name", name))
+            }
+        }
+
         if (startDate != null || endDate != null) {
             val rangeQueryBuilder = QueryBuilders.rangeQuery("createDate")
             startDate?.let { rangeQueryBuilder.from(DateUtil.getDayBeginTime(it).time) }
