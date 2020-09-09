@@ -1,5 +1,6 @@
 package com.zeongit.web.service
 
+import com.zeongit.data.constant.AspectRatio
 import com.zeongit.data.index.primary.document.PictureDocument
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms
 import org.springframework.data.domain.Page
@@ -14,6 +15,7 @@ interface PictureDocumentService {
     fun paging(pageable: Pageable, tagList: List<String>? = null,
                precise: Boolean = false, name: String? = null,
                startDate: Date? = null, endDate: Date? = null,
+               aspectRatio: AspectRatio? = null,
                userId: Int? = null, self: Boolean = false,
                mustUserList: List<Int>? = null,
                userBlacklist: List<Int>? = null, pictureBlacklist: List<Int>? = null, tagBlacklist: List<String>? = null

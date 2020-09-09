@@ -1,6 +1,6 @@
 package com.zeongit.web.controller
 
-import com.zeongit.data.constant.BlockState
+import com.zeongit.data.constant.AspectRatio
 import com.zeongit.data.constant.PrivacyState
 import com.zeongit.data.database.primary.entity.Picture
 import com.zeongit.data.database.primary.entity.Tag
@@ -13,7 +13,7 @@ import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.exception.ProgramException
 import com.zeongit.web.core.communal.PictureVoAbstract
 import com.zeongit.web.service.*
-import com.zeongit.web.vo.*
+import com.zeongit.web.vo.PictureVo
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -100,12 +100,13 @@ class PictureController(private val pictureService: PictureService,
      */
     @GetMapping("paging")
     @RestfulPack
-    fun paging(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable,@RequestParam tagList: List<String>?, precise: Boolean?, name: String?, startDate: Date?, endDate: Date?): Page<PictureVo> {
+    fun paging(@CurrentUserInfoId userId: Int?, @PageableDefault(value = 20) pageable: Pageable, @RequestParam tagList: List<String>?, precise: Boolean?, name: String?, startDate: Date?, endDate: Date?, aspectRatio: AspectRatio?): Page<PictureVo> {
         return getPageVo(pictureDocumentService.paging(pageable,
                 tagList,
                 precise != null && precise,
                 name,
                 startDate, endDate,
+                aspectRatio,
                 userBlacklist = userBlackHoleService.listBlacklist(userId),
                 pictureBlacklist = pictureBlackHoleService.listBlacklist(userId),
                 tagBlacklist = tagBlackHoleService.listBlacklist(userId)

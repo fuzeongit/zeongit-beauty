@@ -1,5 +1,6 @@
 package com.zeongit.web.serviceimpl
 
+import com.zeongit.data.constant.AspectRatio
 import com.zeongit.share.exception.NotFoundException
 import com.zeongit.share.util.DateUtil
 import com.zeongit.data.constant.PrivacyState
@@ -47,6 +48,7 @@ class PictureDocumentServiceImpl(
     override fun paging(pageable: Pageable, tagList: List<String>?,
                         precise: Boolean, name: String?,
                         startDate: Date?, endDate: Date?,
+                        aspectRatio: AspectRatio?,
                         userId: Int?, self: Boolean,
                         mustUserList: List<Int>?,
                         userBlacklist: List<Int>?, pictureBlacklist: List<Int>?, tagBlacklist: List<String>?): Page<PictureDocument> {
@@ -75,6 +77,9 @@ class PictureDocumentServiceImpl(
             startDate?.let { rangeQueryBuilder.from(DateUtil.getDayBeginTime(it).time) }
             endDate?.let { rangeQueryBuilder.lte(DateUtil.getDayEndTime(it).time) }
             mustQuery.must(rangeQueryBuilder)
+        }
+        if (aspectRatio != null) {
+            mustQuery.must(QueryBuilders.termQuery("aspectRatio", aspectRatio.toString()))
         }
         if (!self) {
             mustQuery.must(QueryBuilders.termQuery("privacy", PrivacyState.PUBLIC.toString()))
@@ -190,6 +195,7 @@ class PictureDocumentServiceImpl(
                 PageRequest.of(0, 1, Sort(Sort.Direction.DESC, "likeAmount")),
                 listOf(tag), true, null,
                 null, null,
+                null,
                 null, false,
                 listOf(),
                 userBlackHoleService.listBlacklist(userId),

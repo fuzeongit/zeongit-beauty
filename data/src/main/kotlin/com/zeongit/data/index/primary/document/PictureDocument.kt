@@ -40,7 +40,7 @@ class PictureDocument() : Serializable {
     @Field(type = FieldType.Keyword, index = false)
     var height: Long = 0
 
-    @Field(type = FieldType.Keyword, index = false)
+    @Field(type = FieldType.Keyword)
     lateinit var aspectRatio: AspectRatio
 
     @Field(type = FieldType.Keyword)
