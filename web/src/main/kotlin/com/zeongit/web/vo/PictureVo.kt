@@ -2,7 +2,7 @@ package com.zeongit.web.vo
 
 import com.zeongit.data.constant.CollectState
 import com.zeongit.data.constant.PrivacyState
-import com.zeongit.data.constant.SizeType
+import com.zeongit.data.constant.AspectRatio
 import com.zeongit.data.index.primary.document.PictureDocument
 import org.springframework.beans.BeanUtils
 import java.util.*
@@ -28,7 +28,7 @@ class PictureVo() {
 
     var height: Long = 0
 
-    lateinit var sizeType: SizeType
+    lateinit var aspectRatio: AspectRatio
 
     /**
      * 由于es的查询的原因，在空的情况下也有一条空的数据而不是空数组

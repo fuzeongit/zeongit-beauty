@@ -1,10 +1,10 @@
 package com.zeongit.web.service
 
+import com.zeongit.data.constant.AspectRatio
 import com.zeongit.data.constant.PictureLifeState
 import com.zeongit.data.constant.PrivacyState
-import com.zeongit.data.constant.SizeType
-import com.zeongit.data.index.primary.document.PictureDocument
 import com.zeongit.data.database.primary.entity.Picture
+import com.zeongit.data.index.primary.document.PictureDocument
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import java.util.*
@@ -15,7 +15,7 @@ import java.util.*
  * @author fjj
  */
 interface PictureService {
-    fun paging(pageable: Pageable, userId: Int?, name: String?, privacy: PrivacyState?, life: PictureLifeState?, master: Boolean?, startDate: Date?, endDate: Date?, sizeType: SizeType?): Page<Picture>
+    fun paging(pageable: Pageable, userId: Int?, name: String?, privacy: PrivacyState?, life: PictureLifeState?, master: Boolean?, startDate: Date?, endDate: Date?, aspectRatio: AspectRatio?): Page<Picture>
 
     fun get(id: Int): Picture
 

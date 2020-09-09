@@ -1,7 +1,7 @@
 package com.zeongit.data.index.primary.document
 
+import com.zeongit.data.constant.AspectRatio
 import com.zeongit.data.constant.PrivacyState
-import com.zeongit.data.constant.SizeType
 import com.zeongit.data.database.primary.entity.Picture
 import org.springframework.data.annotation.Id
 import org.springframework.data.elasticsearch.annotations.Document
@@ -41,7 +41,7 @@ class PictureDocument() : Serializable {
     var height: Long = 0
 
     @Field(type = FieldType.Keyword, index = false)
-    lateinit var sizeType: SizeType
+    lateinit var aspectRatio: AspectRatio
 
     @Field(type = FieldType.Keyword)
     var tagList: MutableList<String> = mutableListOf()
@@ -64,7 +64,7 @@ class PictureDocument() : Serializable {
         this.privacy = picture.privacy
         this.width = picture.width
         this.height = picture.height
-        this.sizeType = picture.sizeType
+        this.aspectRatio = picture.aspectRatio
         this.createDate = picture.createDate!!
         this.lastModifiedDate = picture.lastModifiedDate!!
         this.tagList = picture.tagList.asSequence().map { it.name }.toMutableList()

@@ -1,10 +1,7 @@
 package com.zeongit.data.database.primary.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.zeongit.data.constant.PictureLifeState
-import com.zeongit.data.constant.PictureState
-import com.zeongit.data.constant.PrivacyState
-import com.zeongit.data.constant.SizeType
+import com.zeongit.data.constant.*
 import com.zeongit.share.entity.AskEntity
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.io.Serializable
@@ -26,11 +23,11 @@ class Picture() : AskEntity(), Serializable {
 
     //图片名称
     @Column(name = "name")
-    var name: String = "无题"
+    lateinit var name: String
 
     //图片简介
     @Column(name = "introduction")
-    var introduction: String = "身无彩凤双飞翼，心有灵犀一点通"
+    lateinit var introduction: String
 
     //是否公开
     @Column(name = "privacy")
@@ -53,8 +50,8 @@ class Picture() : AskEntity(), Serializable {
     var height: Long = 0
 
     //图片类型
-    @Column(name = "size_type")
-    lateinit var sizeType: SizeType
+    @Column(name = "aspect_ratio")
+    lateinit var aspectRatio: AspectRatio
 
     //标签列表
     @JsonIgnore
@@ -70,10 +67,10 @@ class Picture() : AskEntity(), Serializable {
         this.width = width
         this.height = height
         this.privacy = privacy
-        this.sizeType = when {
-            width > height -> SizeType.TRANSVERSE
-            width < height -> SizeType.VERTICAL
-            else -> SizeType.SQUARE
+        this.aspectRatio = when {
+            width > height -> AspectRatio.HORIZONTAL
+            width < height -> AspectRatio.VERTICAL
+            else -> AspectRatio.SQUARE
         }
     }
 }

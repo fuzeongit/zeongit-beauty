@@ -1,14 +1,14 @@
 package com.zeongit.web.serviceimpl
 
-import com.zeongit.share.exception.NotFoundException
-import com.zeongit.share.util.DateUtil
+import com.zeongit.data.constant.AspectRatio
 import com.zeongit.data.constant.PictureLifeState
 import com.zeongit.data.constant.PrivacyState
-import com.zeongit.data.constant.SizeType
 import com.zeongit.data.database.primary.dao.PictureDao
 import com.zeongit.data.database.primary.entity.Picture
 import com.zeongit.data.index.primary.document.PictureDocument
+import com.zeongit.share.exception.NotFoundException
 import com.zeongit.share.exception.PermissionException
+import com.zeongit.share.util.DateUtil
 import com.zeongit.web.service.PictureDocumentService
 import com.zeongit.web.service.PictureService
 import org.springframework.data.domain.Page
@@ -22,7 +22,7 @@ import javax.persistence.criteria.Predicate
 @Service
 class PictureServiceImpl(private val pictureDao: PictureDao,
                          private val pictureDocumentService: PictureDocumentService) : PictureService {
-    override fun paging(pageable: Pageable, userId: Int?, name: String?, privacy: PrivacyState?, life: PictureLifeState?, master: Boolean?, startDate: Date?, endDate: Date?, sizeType: SizeType?): Page<Picture> {
+    override fun paging(pageable: Pageable, userId: Int?, name: String?, privacy: PrivacyState?, life: PictureLifeState?, master: Boolean?, startDate: Date?, endDate: Date?, aspectRatio: AspectRatio?): Page<Picture> {
         val specification = Specification<Picture> { root, _, criteriaBuilder ->
             val predicatesList = ArrayList<Predicate>()
             if (!name.isNullOrEmpty()) {
@@ -50,8 +50,8 @@ class PictureServiceImpl(private val pictureDao: PictureDao,
             if (userId != null) {
                 predicatesList.add(criteriaBuilder.equal(root.get<Int>("createdBy"), userId))
             }
-            if (sizeType != null) {
-                predicatesList.add(criteriaBuilder.equal(root.get<String>("sizeType"), sizeType))
+            if (aspectRatio != null) {
+                predicatesList.add(criteriaBuilder.equal(root.get<String>("aspectRatio"), aspectRatio))
             }
             criteriaBuilder.and(*predicatesList.toArray(arrayOfNulls<Predicate>(predicatesList.size)))
         }
