@@ -78,7 +78,7 @@ class PictureDocumentServiceImpl(private val pictureDocumentDao: PictureDocument
 
     override fun getFirstByTag(tag: String): PictureDocument {
         return paging(
-                PageRequest.of(0, 1, Sort(Sort.Direction.DESC, "likeAmount")),
+                PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "likeAmount")),
                 listOf(tag), true, null,
                 null, null,
                 null, false).content.first()
