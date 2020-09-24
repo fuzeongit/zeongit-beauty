@@ -1,21 +1,17 @@
 package com.zeongit.admin.controller
 
-import com.zeongit.admin.service.PictureService
-import com.zeongit.admin.service.PixivPictureService
-import com.zeongit.admin.service.UserInfoService
-import com.zeongit.admin.service.UserService
+import com.zeongit.admin.dto.CollectDto
+import com.zeongit.admin.service.*
 import com.zeongit.data.constant.TransferState
 import com.zeongit.data.database.admin.entity.PixivPicture
+import com.zeongit.data.database.admin.entity.PixivWork
 import com.zeongit.data.database.primary.entity.Tag
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.database.account.entity.UserInfo
 import com.zeongit.share.enum.Gender
 import com.zeongit.share.exception.NotFoundException
 import com.zeongit.share.util.EmojiUtil
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.util.*
 
 /**
@@ -28,7 +24,9 @@ class CollectController(
         private val pictureService: PictureService,
         private val userService: UserService,
         private val userInfoService: UserInfoService,
-        private val pixivPictureService: PixivPictureService) {
+        private val pixivPictureService: PixivPictureService,
+        private val pixivWorkService: PixivWorkService
+) {
     /**
      * 获取采集标签任务
      */
@@ -98,6 +96,46 @@ class CollectController(
                 picture.createdBy = info.id!!
                 picture.lastModifiedBy = info.id!!
                 pictureService.save(picture)
+            }
+        }
+        return true
+    }
+
+    @PostMapping("insert")
+    @RestfulPack
+    fun insert(@RequestBody collectDto: CollectDto): Boolean {
+        for (work in collectDto.works ?: listOf()) {
+            try {
+                val pixivWork = try {
+                    pixivWorkService.getByPixivId(work.id!!)
+                } catch (e: Exception) {
+                    PixivWork()
+                }
+                pixivWork.illustId = work.illustId
+                pixivWork.illustTitle = work.illustTitle
+                pixivWork.pixivId = work.id
+                pixivWork.title = work.title
+                pixivWork.illustType = work.illustType
+                pixivWork.xRestrict = work.xRestrict
+                pixivWork.pixivRestrict = work.restrict
+                pixivWork.sl = work.sl
+                pixivWork.url = work.url
+                pixivWork.description = work.description
+                pixivWork.tags = work.tags?.joinToString("|")
+                pixivWork.userId = work.userId
+                pixivWork.userName = work.userName
+                pixivWork.width = work.width
+                pixivWork.height = work.height
+                pixivWork.pageCount = work.pageCount
+                pixivWork.bookmarkable = work.isBookmarkable
+                pixivWork.adContainer = work.isAdContainer
+                pixivWork.createDate = work.createDate
+                pixivWork.updateDate = work.updateDate
+                pixivWork.profileImageUrl = work.profileImageUrl
+
+                pixivWorkService.save(pixivWork)
+            } catch (e: Exception) {
+                println(e.message)
             }
         }
         return true

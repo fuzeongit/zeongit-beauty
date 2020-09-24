@@ -4,19 +4,16 @@ import com.zeongit.admin.service.PictureService
 import com.zeongit.admin.service.PixivPictureService
 import com.zeongit.admin.service.UserInfoService
 import com.zeongit.admin.service.UserService
+import com.zeongit.data.constant.AspectRatio
 import com.zeongit.data.constant.PictureLifeState
-import com.zeongit.share.annotations.RestfulPack
-import com.zeongit.share.exception.NotFoundException
 import com.zeongit.data.constant.PrivacyState
-import com.zeongit.data.constant.SizeType
-import com.zeongit.data.constant.TransferState
 import com.zeongit.data.database.admin.entity.PixivPicture
 import com.zeongit.data.database.primary.entity.Picture
 import com.zeongit.data.index.primary.document.PictureDocument
 import com.zeongit.qiniu.core.component.QiniuConfig
 import com.zeongit.qiniu.service.BucketService
-import com.zeongit.share.enum.Gender
-import com.zeongit.share.database.account.entity.UserInfo
+import com.zeongit.share.annotations.RestfulPack
+import com.zeongit.share.exception.NotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate
@@ -44,8 +41,8 @@ class PictureController(
 
     @GetMapping("paging")
     @RestfulPack
-    fun paging(pageable: Pageable, userId: Int?, name: String?, privacy: PrivacyState?, life: PictureLifeState?, master: Boolean?, startDate: Date?, endDate: Date?, sizeType: SizeType?): Page<Picture> {
-        return pictureService.paging(pageable, userId, name, privacy, life, master, startDate, endDate, sizeType)
+    fun paging(pageable: Pageable, userId: Int?, name: String?, privacy: PrivacyState?, life: PictureLifeState?, master: Boolean?, startDate: Date?, endDate: Date?, aspectRatio: AspectRatio?): Page<Picture> {
+        return pictureService.paging(pageable, userId, name, privacy, life, master, startDate, endDate, aspectRatio)
     }
 
     /**
@@ -220,5 +217,14 @@ class PictureController(
             }
         }
         return resultList
+    }
+
+    /**
+     * 获取套图
+     */
+    @GetMapping("test")
+    @RestfulPack
+    fun listPictureBySuit(@RequestBody body: Any?) {
+        println(body)
     }
 }
