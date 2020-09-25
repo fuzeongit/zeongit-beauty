@@ -7,6 +7,7 @@ import com.zeongit.admin.service.UserService
 import com.zeongit.admin.dto.CollectDto
 import com.zeongit.admin.service.*
 import com.zeongit.data.constant.TransferState
+import com.zeongit.data.database.admin.entity.CollectError
 import com.zeongit.data.database.admin.entity.PixivPicture
 import com.zeongit.data.database.admin.entity.PixivWork
 import com.zeongit.data.database.primary.entity.Tag
@@ -33,7 +34,8 @@ class CollectController(
         private val userService: UserService,
         private val userInfoService: UserInfoService,
         private val pixivPictureService: PixivPictureService,
-        private val pixivWorkService: PixivWorkService
+        private val pixivWorkService: PixivWorkService,
+        private val collectErrorService: CollectErrorService
 ) {
     /**
      * 获取采集标签任务
@@ -120,9 +122,9 @@ class CollectController(
                     PixivWork()
                 }
                 pixivWork.illustId = work.illustId
-                pixivWork.illustTitle = work.illustTitle
+                pixivWork.illustTitle = EmojiUtil.emojiChange(work.illustTitle ?: "").trim()
                 pixivWork.pixivId = work.id
-                pixivWork.title = work.title
+                pixivWork.title = EmojiUtil.emojiChange(work.title ?: "").trim()
                 pixivWork.illustType = work.illustType
                 pixivWork.xRestrict = work.xRestrict
                 pixivWork.pixivRestrict = work.restrict
@@ -131,7 +133,7 @@ class CollectController(
                 pixivWork.description = work.description
                 pixivWork.tags = work.tags?.joinToString("|")
                 pixivWork.userId = work.userId
-                pixivWork.userName = work.userName
+                pixivWork.userName = EmojiUtil.emojiChange(work.userName ?: "").trim()
                 pixivWork.width = work.width
                 pixivWork.height = work.height
                 pixivWork.pageCount = work.pageCount
@@ -143,6 +145,7 @@ class CollectController(
 
                 pixivWorkService.save(pixivWork)
             } catch (e: Exception) {
+                collectErrorService.save(CollectError(work.illustId ?: "", e.message))
                 println(e.message)
             }
         }
