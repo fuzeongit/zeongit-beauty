@@ -1,10 +1,7 @@
 package com.zeongit.admin.controller
 
-import com.zeongit.admin.service.PictureService
-import com.zeongit.admin.service.PixivPictureService
-import com.zeongit.admin.service.UserInfoService
-import com.zeongit.admin.service.UserService
 import com.zeongit.admin.dto.CollectDto
+import com.zeongit.admin.dto.UpdateOriginalUrlDto
 import com.zeongit.admin.service.*
 import com.zeongit.data.constant.TransferState
 import com.zeongit.data.database.admin.entity.CollectError
@@ -16,10 +13,9 @@ import com.zeongit.share.database.account.entity.UserInfo
 import com.zeongit.share.enum.Gender
 import com.zeongit.share.exception.NotFoundException
 import com.zeongit.share.util.EmojiUtil
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -111,6 +107,12 @@ class CollectController(
         return true
     }
 
+    @GetMapping("pagingOriginalUrlTask")
+    @RestfulPack
+    fun pagingOriginalUrlTask(@PageableDefault(value = 20) pageable: Pageable): Page<PixivWork> {
+        return pixivWorkService.paging(pageable)
+    }
+
     @PostMapping("insert")
     @RestfulPack
     fun insert(@RequestBody collectDto: CollectDto): Boolean {
@@ -130,7 +132,7 @@ class CollectController(
                 pixivWork.pixivRestrict = work.restrict
                 pixivWork.sl = work.sl
                 pixivWork.url = work.url
-                pixivWork.description = work.description
+                pixivWork.description = EmojiUtil.emojiChange(work.description ?: "").trim()
                 pixivWork.tags = work.tags?.joinToString("|")
                 pixivWork.userId = work.userId
                 pixivWork.userName = EmojiUtil.emojiChange(work.userName ?: "").trim()
@@ -139,7 +141,7 @@ class CollectController(
                 pixivWork.pageCount = work.pageCount
                 pixivWork.bookmarkable = work.isBookmarkable
                 pixivWork.adContainer = work.isAdContainer
-                pixivWork.createDate = work.createDate
+                pixivWork.produceDate = work.createDate
                 pixivWork.updateDate = work.updateDate
                 pixivWork.profileImageUrl = work.profileImageUrl
 
@@ -150,6 +152,16 @@ class CollectController(
             }
         }
         return true
+    }
+
+    @PostMapping("updateOriginalUrl")
+    @RestfulPack
+    fun updateOriginalUrl(@RequestBody dto: UpdateOriginalUrlDto): PixivWork {
+        val work = pixivWorkService.getByPixivId(dto.pixivId!!)
+        work.originalUrl = dto.originalUrl
+        work.translateTag = dto.translateTag
+        work.description = EmojiUtil.emojiChange(dto.description ?: "").trim()
+        return pixivWorkService.save(work)
     }
 
     private fun initUser(nickname: String?): UserInfo {

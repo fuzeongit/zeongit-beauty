@@ -1,5 +1,6 @@
 package com.zeongit.data.database.admin.entity
 
+import com.zeongit.share.entity.BaseEntity
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.io.Serializable
 import java.util.*
@@ -8,12 +9,7 @@ import javax.persistence.*
 @Entity
 @Table(name = "pixiv_work", uniqueConstraints = [UniqueConstraint(columnNames = arrayOf("pixivId"))])
 @EntityListeners(AuditingEntityListener::class)
-class PixivWork()  : Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", length = 10)
-    var id: Int? = null
-
+class PixivWork() : BaseEntity(), Serializable {
     var illustId: String? = null
     var illustTitle: String? = null
     var pixivId: String? = null
@@ -32,7 +28,10 @@ class PixivWork()  : Serializable {
     var pageCount = 0
     var bookmarkable = false
     var adContainer = false
-    var createDate: Date? = null
+    var produceDate: Date? = null
     var updateDate: Date? = null
     var profileImageUrl: String? = null
+    var originalUrl: String? = null
+    var translateTag: String? = null
+    var download: Boolean = false
 }

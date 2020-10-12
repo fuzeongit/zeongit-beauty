@@ -31,3 +31,4 @@ class CollectDto {
     var works: List<Work>? = null
     var total = 0
 }
+
