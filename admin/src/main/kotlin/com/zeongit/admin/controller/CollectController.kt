@@ -107,12 +107,6 @@ class CollectController(
         return true
     }
 
-    @GetMapping("pagingOriginalUrlTask")
-    @RestfulPack
-    fun pagingOriginalUrlTask(@PageableDefault(value = 20) pageable: Pageable): Page<PixivWork> {
-        return pixivWorkService.paging(pageable)
-    }
-
     @PostMapping("insert")
     @RestfulPack
     fun insert(@RequestBody collectDto: CollectDto): Boolean {
@@ -131,7 +125,6 @@ class CollectController(
                 pixivWork.xRestrict = work.xRestrict
                 pixivWork.pixivRestrict = work.restrict
                 pixivWork.sl = work.sl
-                pixivWork.url = work.url
                 pixivWork.description = EmojiUtil.emojiChange(work.description ?: "").trim()
                 pixivWork.tags = work.tags?.joinToString("|")
                 pixivWork.userId = work.userId
@@ -143,25 +136,36 @@ class CollectController(
                 pixivWork.adContainer = work.isAdContainer
                 pixivWork.produceDate = work.createDate
                 pixivWork.updateDate = work.updateDate
-                pixivWork.profileImageUrl = work.profileImageUrl
 
                 pixivWorkService.save(pixivWork)
             } catch (e: Exception) {
-                collectErrorService.save(CollectError(work.illustId ?: "", e.message))
+                collectErrorService.save(CollectError(work.illustId ?: "", "insert--->" + e.message))
                 println(e.message)
             }
         }
         return true
     }
 
+    @GetMapping("pagingOriginalUrlTask")
+    @RestfulPack
+    fun pagingOriginalUrlTask(@PageableDefault(value = 20) pageable: Pageable): Page<PixivWork> {
+        return pixivWorkService.paging(pageable)
+    }
+
     @PostMapping("updateOriginalUrl")
     @RestfulPack
-    fun updateOriginalUrl(@RequestBody dto: UpdateOriginalUrlDto): PixivWork {
-        val work = pixivWorkService.getByPixivId(dto.pixivId!!)
-        work.originalUrl = dto.originalUrl
-        work.translateTag = dto.translateTag
-        work.description = EmojiUtil.emojiChange(dto.description ?: "").trim()
-        return pixivWorkService.save(work)
+    fun updateOriginalUrl(@RequestBody dto: UpdateOriginalUrlDto): Boolean {
+        try {
+            val work = pixivWorkService.getByPixivId(dto.pixivId!!)
+            work.originalUrl = dto.originalUrl
+            work.translateTags = dto.translateTags
+            work.description = EmojiUtil.emojiChange(dto.description ?: "").trim()
+            pixivWorkService.save(work)
+        } catch (e: Exception) {
+            collectErrorService.save(CollectError(dto.pixivId ?: "", "updateOriginalUrl---->" + e.message))
+            println(e.message)
+        }
+        return true
     }
 
     private fun initUser(nickname: String?): UserInfo {

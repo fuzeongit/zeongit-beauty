@@ -18,7 +18,6 @@ class PixivWork() : BaseEntity(), Serializable {
     var xRestrict = 0
     var pixivRestrict = 0
     var sl = 0
-    var url: String? = null
     var description: String? = null
     var tags: String? = null
     var userId: String? = null
@@ -30,8 +29,7 @@ class PixivWork() : BaseEntity(), Serializable {
     var adContainer = false
     var produceDate: Date? = null
     var updateDate: Date? = null
-    var profileImageUrl: String? = null
     var originalUrl: String? = null
-    var translateTag: String? = null
+    var translateTags: String? = null
     var download: Boolean = false
 }
