@@ -18,6 +18,8 @@ class PixivWork() : BaseEntity(), Serializable {
     var xRestrict = 0
     var pixivRestrict = 0
     var sl = 0
+
+    @Column(name = "description", columnDefinition = "text")
     var description: String? = null
     var tags: String? = null
     var userId: String? = null
