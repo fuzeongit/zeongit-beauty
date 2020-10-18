@@ -26,4 +26,7 @@ class PixivWorkServiceImpl(private val pixivWorkDao: PixivWorkDao) : PixivWorkSe
         return pixivWorkDao.findAllByOriginalUrlIsNull(pageable)
     }
 
+    override fun paging2(pageable: Pageable): Page<PixivWork> {
+        return pixivWorkDao.findAll(pageable)
+    }
 }

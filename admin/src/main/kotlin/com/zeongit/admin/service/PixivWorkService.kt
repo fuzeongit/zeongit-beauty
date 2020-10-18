@@ -13,4 +13,7 @@ interface PixivWorkService {
     fun getByPixivId(pixivId: String): PixivWork
 
     fun paging(pageable: Pageable): Page<PixivWork>
+
+
+    fun paging2(pageable: Pageable): Page<PixivWork>
 }

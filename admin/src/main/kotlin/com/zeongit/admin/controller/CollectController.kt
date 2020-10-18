@@ -152,14 +152,55 @@ class CollectController(
         return pixivWorkService.paging(pageable)
     }
 
+    @GetMapping("test")
+    @RestfulPack
+    fun test(@PageableDefault(value = 20) pageable: Pageable): Boolean {
+        val page = pixivWorkService.paging2(pageable)
+        for (item in page.content) {
+            val originalUrl = item.originalUrl
+            if (originalUrl != null && originalUrl.startsWith("https://i.pximg.net/")) {
+                val allUrlList = mutableListOf<String>()
+                val proxyUrlList = mutableListOf<String>()
+                for (i in 0 until item.pageCount) {
+                    val pictureName = originalUrl.split("/").last()
+                    val suitPictureName = pictureName.replace("p0", "p$i")
+                    val suitUrl = originalUrl.replace(pictureName, suitPictureName)
+                    allUrlList.add(suitUrl)
+                    proxyUrlList.add(suitUrl.replace("https://i.pximg.net/",
+                            "https://pixiv.zeongit.workers.dev/"))
+                }
+                item.allUrl = allUrlList.joinToString("|")
+                item.proxyUrl = proxyUrlList.joinToString("|")
+                pixivWorkService.save(item)
+            }
+        }
+        return true
+    }
+
+
     @PostMapping("updateOriginalUrl")
     @RestfulPack
     fun updateOriginalUrl(@RequestBody dto: UpdateOriginalUrlDto): Boolean {
         try {
+            val originalUrl = dto.originalUrl
             val work = pixivWorkService.getByPixivId(dto.pixivId!!)
-            work.originalUrl = dto.originalUrl
+            work.originalUrl = originalUrl
             work.translateTags = dto.translateTags
             work.description = EmojiUtil.emojiChange(dto.description ?: "").trim()
+            if (originalUrl != null && originalUrl.startsWith("https://i.pximg.net/")) {
+                val allUrlList = mutableListOf<String>()
+                val proxyUrlList = mutableListOf<String>()
+                for (i in 0 until work.pageCount) {
+                    val pictureName = originalUrl.split("/").last()
+                    val suitPictureName = pictureName.replace("p0", "p$i")
+                    val suitUrl = originalUrl.replace(pictureName, suitPictureName)
+                    allUrlList.add(suitUrl)
+                    proxyUrlList.add(suitUrl.replace("https://i.pximg.net/",
+                            "https://pixiv.zeongit.workers.dev/"))
+                }
+                work.allUrl = allUrlList.joinToString("|")
+                work.proxyUrl = proxyUrlList.joinToString("|")
+            }
             pixivWorkService.save(work)
         } catch (e: Exception) {
             collectErrorService.save(CollectError(dto.pixivId ?: "", "updateOriginalUrl---->" + e.message))

@@ -34,4 +34,10 @@ class PixivWork() : BaseEntity(), Serializable {
     var originalUrl: String? = null
     var translateTags: String? = null
     var download: Boolean = false
+
+
+    @Column(name = "all_url", columnDefinition = "text")
+    var allUrl: String? = null
+    @Column(name = "proxy_url", columnDefinition = "text")
+    var proxyUrl: String? = null
 }
