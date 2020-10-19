@@ -39,6 +39,10 @@
             <groupId>com.zeongit</groupId>
             <artifactId>data</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.zeongit</groupId>
+            <artifactId>qiniu</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

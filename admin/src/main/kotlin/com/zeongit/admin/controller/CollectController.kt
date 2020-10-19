@@ -1,5 +1,6 @@
 package com.zeongit.admin.controller
 
+import com.qiniu.storage.model.FileInfo
 import com.zeongit.admin.dto.CollectDto
 import com.zeongit.admin.dto.UpdateOriginalUrlDto
 import com.zeongit.admin.service.*
@@ -8,16 +9,24 @@ import com.zeongit.data.database.admin.entity.CollectError
 import com.zeongit.data.database.admin.entity.PixivPicture
 import com.zeongit.data.database.admin.entity.PixivWork
 import com.zeongit.data.database.primary.entity.Tag
+import com.zeongit.qiniu.core.component.QiniuConfig
+import com.zeongit.qiniu.service.BucketService
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.database.account.entity.UserInfo
 import com.zeongit.share.enum.Gender
 import com.zeongit.share.exception.NotFoundException
+import com.zeongit.share.model.Result
 import com.zeongit.share.util.EmojiUtil
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
 import java.util.*
+
 
 /**
  * 供插件使用的
@@ -31,7 +40,9 @@ class CollectController(
         private val userInfoService: UserInfoService,
         private val pixivPictureService: PixivPictureService,
         private val pixivWorkService: PixivWorkService,
-        private val collectErrorService: CollectErrorService
+        private val collectErrorService: CollectErrorService,
+        private val bucketService: BucketService,
+        private val qiniuConfig: QiniuConfig
 ) {
     /**
      * 获取采集标签任务
@@ -151,32 +162,6 @@ class CollectController(
     fun pagingOriginalUrlTask(@PageableDefault(value = 20) pageable: Pageable): Page<PixivWork> {
         return pixivWorkService.paging(pageable)
     }
-
-    @GetMapping("test")
-    @RestfulPack
-    fun test(@PageableDefault(value = 20) pageable: Pageable): Boolean {
-        val page = pixivWorkService.paging2(pageable)
-        for (item in page.content) {
-            val originalUrl = item.originalUrl
-            if (originalUrl != null && originalUrl.startsWith("https://i.pximg.net/")) {
-                val allUrlList = mutableListOf<String>()
-                val proxyUrlList = mutableListOf<String>()
-                for (i in 0 until item.pageCount) {
-                    val pictureName = originalUrl.split("/").last()
-                    val suitPictureName = pictureName.replace("p0", "p$i")
-                    val suitUrl = originalUrl.replace(pictureName, suitPictureName)
-                    allUrlList.add(suitUrl)
-                    proxyUrlList.add(suitUrl.replace("https://i.pximg.net/",
-                            "https://pixiv.zeongit.workers.dev/"))
-                }
-                item.allUrl = allUrlList.joinToString("|")
-                item.proxyUrl = proxyUrlList.joinToString("|")
-                pixivWorkService.save(item)
-            }
-        }
-        return true
-    }
-
 
     @PostMapping("updateOriginalUrl")
     @RestfulPack
