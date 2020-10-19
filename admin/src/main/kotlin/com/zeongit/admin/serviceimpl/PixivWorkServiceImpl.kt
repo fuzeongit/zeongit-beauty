@@ -26,7 +26,15 @@ class PixivWorkServiceImpl(private val pixivWorkDao: PixivWorkDao) : PixivWorkSe
         return pixivWorkDao.findAllByOriginalUrlIsNull(pageable)
     }
 
+    override fun list(): List<PixivWork> {
+        return pixivWorkDao.findAll()
+    }
+
     override fun listByOriginalUrlIsNotNull(): List<PixivWork> {
         return pixivWorkDao.findAllByOriginalUrlIsNotNull()
+    }
+
+    override fun listByDownload(download: Boolean): List<PixivWork> {
+        return pixivWorkDao.findAllByDownload(download)
     }
 }

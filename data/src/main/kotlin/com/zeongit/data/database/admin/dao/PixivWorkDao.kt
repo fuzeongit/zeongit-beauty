@@ -16,4 +16,6 @@ interface PixivWorkDao : JpaRepository<PixivWork, Int> {
     fun findAllByOriginalUrlIsNull(pageable: Pageable): Page<PixivWork>
 
     fun findAllByOriginalUrlIsNotNull(): List<PixivWork>
+
+    fun findAllByDownload(download: Boolean): List<PixivWork>
 }

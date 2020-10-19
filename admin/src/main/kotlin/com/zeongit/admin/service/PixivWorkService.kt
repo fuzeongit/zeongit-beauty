@@ -14,5 +14,9 @@ interface PixivWorkService {
 
     fun paging(pageable: Pageable): Page<PixivWork>
 
+    fun list(): List<PixivWork>
+
     fun listByOriginalUrlIsNotNull(): List<PixivWork>
+
+    fun listByDownload(download: Boolean): List<PixivWork>
 }

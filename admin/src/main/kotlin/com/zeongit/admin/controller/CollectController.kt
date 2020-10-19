@@ -3,11 +3,15 @@ package com.zeongit.admin.controller
 import com.qiniu.storage.model.FileInfo
 import com.zeongit.admin.dto.CollectDto
 import com.zeongit.admin.dto.UpdateOriginalUrlDto
+import com.zeongit.admin.dto.Work
 import com.zeongit.admin.service.*
+import com.zeongit.data.constant.PrivacyState
 import com.zeongit.data.constant.TransferState
 import com.zeongit.data.database.admin.entity.CollectError
 import com.zeongit.data.database.admin.entity.PixivPicture
 import com.zeongit.data.database.admin.entity.PixivWork
+import com.zeongit.data.database.admin.entity.PixivWorkDetail
+import com.zeongit.data.database.primary.entity.Picture
 import com.zeongit.data.database.primary.entity.Tag
 import com.zeongit.qiniu.core.component.QiniuConfig
 import com.zeongit.qiniu.service.BucketService
@@ -21,11 +25,9 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
-import java.io.BufferedWriter
-import java.io.File
-import java.io.FileWriter
-import java.io.IOException
+import java.io.*
 import java.util.*
+import javax.imageio.ImageIO
 
 
 /**
@@ -40,57 +42,9 @@ class CollectController(
         private val userInfoService: UserInfoService,
         private val pixivPictureService: PixivPictureService,
         private val pixivWorkService: PixivWorkService,
-        private val collectErrorService: CollectErrorService,
-        private val bucketService: BucketService,
-        private val qiniuConfig: QiniuConfig
+        private val pixivWorkDetailService: PixivWorkDetailService,
+        private val collectErrorService: CollectErrorService
 ) {
-    /**
-     * 获取采集标签任务
-     */
-    @GetMapping("listTagTask")
-    @RestfulPack
-    fun listTagTask(state: TransferState?): List<PixivPicture> {
-        return pixivPictureService.listByState(state ?: TransferState.WAIT)
-    }
-
-    /**
-     * 保存采集
-     */
-    @PostMapping("save")
-    @RestfulPack
-    fun pixivPictureSave(pixivId: String, name: String, userName: String, userId: String, tagString: String): Boolean {
-        val pixivPictureList = pixivPictureService.listByPixivId(pixivId)
-        for (pixivPicture in pixivPictureList) {
-            if (pixivPicture.state != TransferState.WAIT) continue
-            pixivPicture.pixivId = pixivId
-            pixivPicture.name = EmojiUtil.emojiChange(name).trim()
-            pixivPicture.pixivUserName = EmojiUtil.emojiChange(userName).trim()
-            pixivPicture.pixivUserId = userId
-            pixivPicture.tagList = EmojiUtil.emojiChange(tagString).trim()
-            pixivPicture.state = TransferState.SUCCESS
-            try {
-                val picture = pictureService.get(pixivPicture.pictureId)
-                picture.name = pixivPicture.name!!
-                picture.tagList.addAll(pixivPicture.tagList!!.split("|").asSequence().toSet().asSequence().map { Tag(it) }.toList())
-                pixivPictureService.save(pixivPicture)
-                val info = try {
-                    val pixivUser = pixivPictureService.getAccountByPixivUserId(pixivPicture.pixivUserId!!)
-                    userInfoService.get(pixivUser.userId)
-                } catch (e: NotFoundException) {
-                    val info = initUser(pixivPicture.pixivUserName)
-                    pixivPictureService.saveAccount(info.id!!, pixivPicture.pixivUserId!!)
-                    info
-                }
-                picture.createdBy = info.id!!
-                picture.lastModifiedBy = info.id!!
-                pictureService.save(picture, true)
-            } catch (e: Exception) {
-            }
-        }
-        return true
-    }
-
-
     /**
      * 绑定user
      */
@@ -113,6 +67,34 @@ class CollectController(
                 picture.createdBy = info.id!!
                 picture.lastModifiedBy = info.id!!
                 pictureService.save(picture)
+            }
+        }
+        return true
+    }
+
+
+
+    @GetMapping("test")
+    @RestfulPack
+    fun test(): Boolean {
+        val list = pixivWorkService.list()
+        for (work in list) {
+            val originalUrl = work.originalUrl
+            if (originalUrl != null && originalUrl.startsWith("https://i.pximg.net/")) {
+                for (i in 0 until work.pageCount) {
+                    val pictureName = originalUrl.split("/").last()
+                    val suitPictureName = pictureName.replace("p0", "p$i")
+                    val suitUrl = originalUrl.replace(pictureName, suitPictureName)
+                    pixivWorkDetailService.save(PixivWorkDetail(
+                            work.pixivId!!,
+                            pictureName,
+                            suitUrl,
+                            suitUrl.replace("https://i.pximg.net/",
+                                    "https://pixiv.zeongit.workers.dev/"),
+                            work.xRestrict,
+                            work.pixivRestrict
+                    ))
+                }
             }
         }
         return true
@@ -179,6 +161,15 @@ class CollectController(
                     val pictureName = originalUrl.split("/").last()
                     val suitPictureName = pictureName.replace("p0", "p$i")
                     val suitUrl = originalUrl.replace(pictureName, suitPictureName)
+                    pixivWorkDetailService.save(PixivWorkDetail(
+                            work.pixivId!!,
+                            pictureName,
+                            suitUrl,
+                            suitUrl.replace("https://i.pximg.net/",
+                                    "https://pixiv.zeongit.workers.dev/"),
+                            work.xRestrict,
+                            work.pixivRestrict
+                    ))
                     allUrlList.add(suitUrl)
                     proxyUrlList.add(suitUrl.replace("https://i.pximg.net/",
                             "https://pixiv.zeongit.workers.dev/"))
@@ -193,6 +184,23 @@ class CollectController(
         }
         return true
     }
+
+    /**
+     * 根据文件夹写入图片写入数据库
+     * 本地使用
+     */
+    @PostMapping("checkDownload")
+    @RestfulPack
+    fun checkDownload(folderPath: String): Boolean {
+        val pixivWorkList = pixivWorkService.listByDownload(false)
+        val fileNameList = File(folderPath).list() ?: arrayOf()
+        for (pixivWork in pixivWorkList) {
+            pixivWork.download = fileNameList.toList().filter { it.toLowerCase().startsWith(pixivWork.pixivId!!) }.size == pixivWork.pageCount
+            pixivWorkService.save(pixivWork)
+        }
+        return true
+    }
+
 
     private fun initUser(nickname: String?): UserInfo {
         var phone = Random().nextInt(10)
