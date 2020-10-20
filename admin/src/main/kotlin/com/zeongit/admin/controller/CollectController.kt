@@ -37,33 +37,6 @@ class CollectController(
         private val pixivWorkDetailService: PixivWorkDetailService,
         private val collectErrorService: CollectErrorService
 ) {
-//    /**
-//     * 绑定user
-//     */
-//    @PostMapping("bindUser")
-//    @RestfulPack
-//    fun bindUser(userId: Int): Boolean {
-//        //临时id
-//        val pictureList = pictureService.listByUserId(userId)
-//        for (picture in pictureList) {
-//            val pixivPicture = pixivPictureService.getByPictureId(picture.id!!)
-//            if (pixivPicture.state == TransferState.SUCCESS) {
-//                val info = try {
-//                    val pixivUser = pixivPictureService.getAccountByPixivUserId(pixivPicture.pixivUserId!!)
-//                    userInfoService.get(pixivUser.userId)
-//                } catch (e: NotFoundException) {
-//                    val info = initUser(pixivPicture.pixivUserName)
-//                    pixivPictureService.saveAccount(info.id!!, pixivPicture.pixivUserId!!)
-//                    info
-//                }
-//                picture.createdBy = info.id!!
-//                picture.lastModifiedBy = info.id!!
-//                pictureService.save(picture)
-//            }
-//        }
-//        return true
-//    }
-
     @GetMapping("test")
     @RestfulPack
     fun test(): Boolean {
