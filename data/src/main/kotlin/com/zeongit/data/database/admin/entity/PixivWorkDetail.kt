@@ -6,10 +6,11 @@ import java.io.Serializable
 import javax.persistence.*
 
 @Entity
-@Table(name = "pixiv_work_detail", uniqueConstraints = [UniqueConstraint(columnNames = arrayOf("url"))])
+@Table(name = "pixiv_work_detail", uniqueConstraints = [UniqueConstraint(columnNames = arrayOf("name"))])
 @EntityListeners(AuditingEntityListener::class)
 class PixivWorkDetail() : BaseEntity(), Serializable {
     var pixivId: String? = null
+
     @Column(name = "name")
     lateinit var name: String
     lateinit var url: String
@@ -17,7 +18,7 @@ class PixivWorkDetail() : BaseEntity(), Serializable {
     var xRestrict = 0
     var pixivRestrict = 0
     var download: Boolean = false
-    var make: Boolean = false
+    var using: Boolean = false
 
     constructor(
             pixivId: String,

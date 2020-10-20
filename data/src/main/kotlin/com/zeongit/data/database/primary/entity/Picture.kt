@@ -26,7 +26,7 @@ class Picture() : AskEntity(), Serializable {
     lateinit var name: String
 
     //图片简介
-    @Column(name = "introduction")
+    @Column(name = "introduction", columnDefinition = "text")
     lateinit var introduction: String
 
     //是否公开

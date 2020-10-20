@@ -1,25 +1,18 @@
 package com.zeongit.admin.controller
 
-import com.qiniu.storage.model.FileInfo
 import com.zeongit.admin.dto.CollectDto
 import com.zeongit.admin.dto.UpdateOriginalUrlDto
-import com.zeongit.admin.dto.Work
 import com.zeongit.admin.service.*
 import com.zeongit.data.constant.PrivacyState
-import com.zeongit.data.constant.TransferState
 import com.zeongit.data.database.admin.entity.CollectError
-import com.zeongit.data.database.admin.entity.PixivPicture
 import com.zeongit.data.database.admin.entity.PixivWork
 import com.zeongit.data.database.admin.entity.PixivWorkDetail
 import com.zeongit.data.database.primary.entity.Picture
 import com.zeongit.data.database.primary.entity.Tag
-import com.zeongit.qiniu.core.component.QiniuConfig
-import com.zeongit.qiniu.service.BucketService
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.database.account.entity.UserInfo
 import com.zeongit.share.enum.Gender
 import com.zeongit.share.exception.NotFoundException
-import com.zeongit.share.model.Result
 import com.zeongit.share.util.EmojiUtil
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -27,7 +20,6 @@ import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
 import java.io.*
 import java.util.*
-import javax.imageio.ImageIO
 
 
 /**
@@ -40,39 +32,37 @@ class CollectController(
         private val pictureService: PictureService,
         private val userService: UserService,
         private val userInfoService: UserInfoService,
-        private val pixivPictureService: PixivPictureService,
+        private val pixivUserService: PixivUserService,
         private val pixivWorkService: PixivWorkService,
         private val pixivWorkDetailService: PixivWorkDetailService,
         private val collectErrorService: CollectErrorService
 ) {
-    /**
-     * 绑定user
-     */
-    @PostMapping("bindUser")
-    @RestfulPack
-    fun bindUser(userId: Int): Boolean {
-        //临时id
-        val pictureList = pictureService.listByUserId(userId)
-        for (picture in pictureList) {
-            val pixivPicture = pixivPictureService.getByPictureId(picture.id!!)
-            if (pixivPicture.state == TransferState.SUCCESS) {
-                val info = try {
-                    val pixivUser = pixivPictureService.getAccountByPixivUserId(pixivPicture.pixivUserId!!)
-                    userInfoService.get(pixivUser.userId)
-                } catch (e: NotFoundException) {
-                    val info = initUser(pixivPicture.pixivUserName)
-                    pixivPictureService.saveAccount(info.id!!, pixivPicture.pixivUserId!!)
-                    info
-                }
-                picture.createdBy = info.id!!
-                picture.lastModifiedBy = info.id!!
-                pictureService.save(picture)
-            }
-        }
-        return true
-    }
-
-
+//    /**
+//     * 绑定user
+//     */
+//    @PostMapping("bindUser")
+//    @RestfulPack
+//    fun bindUser(userId: Int): Boolean {
+//        //临时id
+//        val pictureList = pictureService.listByUserId(userId)
+//        for (picture in pictureList) {
+//            val pixivPicture = pixivPictureService.getByPictureId(picture.id!!)
+//            if (pixivPicture.state == TransferState.SUCCESS) {
+//                val info = try {
+//                    val pixivUser = pixivPictureService.getAccountByPixivUserId(pixivPicture.pixivUserId!!)
+//                    userInfoService.get(pixivUser.userId)
+//                } catch (e: NotFoundException) {
+//                    val info = initUser(pixivPicture.pixivUserName)
+//                    pixivPictureService.saveAccount(info.id!!, pixivPicture.pixivUserId!!)
+//                    info
+//                }
+//                picture.createdBy = info.id!!
+//                picture.lastModifiedBy = info.id!!
+//                pictureService.save(picture)
+//            }
+//        }
+//        return true
+//    }
 
     @GetMapping("test")
     @RestfulPack
@@ -198,9 +188,66 @@ class CollectController(
             pixivWork.download = fileNameList.toList().filter { it.toLowerCase().startsWith(pixivWork.pixivId!!) }.size == pixivWork.pageCount
             pixivWorkService.save(pixivWork)
         }
+
+        val pixivWorkDetailList = pixivWorkDetailService.listByDownload(false)
+
+        for (pixivWorkDetail in pixivWorkDetailList) {
+            pixivWorkDetail.download = fileNameList.toList().contains(pixivWorkDetail.name)
+            pixivWorkDetailService.save(pixivWorkDetail)
+        }
         return true
     }
 
+    /**
+     * 根据文件夹写入图片写入数据库
+     * 本地使用
+     */
+    @PostMapping("checkUse")
+    @RestfulPack
+    fun checkUse(folderPath: String, userId: Int, privacy: PrivacyState): Boolean {
+        val fileNameList = File(folderPath).list() ?: arrayOf()
+        for (fileName in fileNameList) {
+            try {
+                val pixivWorkDetail = try {
+                    pixivWorkDetailService.getByName(fileName)
+                } catch (e: NotFoundException) {
+                    PixivWorkDetail(fileName.split("_").first(), fileName, "hide", "hide", 0, 0)
+                }
+                pixivWorkDetail.using = true
+                pixivWorkDetailService.save(pixivWorkDetail)
+
+                val pixivWork = pixivWorkService.getByPixivId(pixivWorkDetail.pixivId!!)
+
+                val picture = Picture(
+                        fileName,
+                        pixivWork.width.toLong(),
+                        pixivWork.height.toLong(),
+                        pixivWork.title,
+                        pixivWork.description,
+                        privacy)
+
+                val translateTags = pixivWork.translateTags ?: ""
+                if (translateTags.isNotBlank()) {
+                    picture.tagList.addAll(translateTags.split("|").asSequence().toSet().asSequence().map { Tag(it) }.toList())
+                }
+                val info = try {
+                    val pixivUser = pixivUserService.getByPixivUserId(pixivWork.userId!!)
+                    userInfoService.get(pixivUser.userId)
+                } catch (e: NotFoundException) {
+                    val info = initUser(pixivWork.userName)
+                    pixivUserService.save(info.id!!, pixivWork.userId!!)
+                    info
+                }
+                picture.createdBy = info.id!!
+                picture.lastModifiedBy = info.id!!
+                pictureService.save(picture, true)
+            } catch (e: Exception) {
+                println(fileName)
+                println(e)
+            }
+        }
+        return true
+    }
 
     private fun initUser(nickname: String?): UserInfo {
         var phone = Random().nextInt(10)

@@ -10,4 +10,6 @@ interface PixivWorkDetailDao : JpaRepository<PixivWorkDetail, Int> {
     fun getByName(name: String): Optional<PixivWorkDetail>
 
     fun findAllByDownload(download: Boolean): List<PixivWorkDetail>
+
+    fun findAllByPixivId(pixivId: String): List<PixivWorkDetail>
 }

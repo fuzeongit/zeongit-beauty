@@ -20,4 +20,16 @@ class PixivWorkDetailServiceImpl(private val pixivWorkDetailDao: PixivWorkDetail
         return pixivWorkDetailDao.getByName(name).orElseThrow { NotFoundException("图片不存在") }
     }
 
+    override fun listByPixivId(pixivId: String): List<PixivWorkDetail> {
+        return pixivWorkDetailDao.findAllByPixivId(pixivId)
+    }
+
+    override fun listByDownload(download: Boolean): List<PixivWorkDetail> {
+        return pixivWorkDetailDao.findAllByDownload(download)
+    }
+
+    override fun saveAll(pixivWorkDetailList: List<PixivWorkDetail>): List<PixivWorkDetail> {
+        return pixivWorkDetailDao.saveAll(pixivWorkDetailList)
+    }
+
 }
