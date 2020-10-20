@@ -18,8 +18,12 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
-import java.io.*
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
 import java.util.*
+import javax.imageio.ImageIO
 
 
 /**
@@ -189,7 +193,17 @@ class CollectController(
                 pixivWorkDetail.using = true
                 pixivWorkDetailService.save(pixivWorkDetail)
 
-                val pixivWork = pixivWorkService.getByPixivId(pixivWorkDetail.pixivId!!)
+                val pixivWork = try {
+                    pixivWorkService.getByPixivId(pixivWorkDetail.pixivId!!)
+                } catch (e: NotFoundException) {
+                    val picture = File("$folderPath/$fileName")
+                    val read = ImageIO.read(FileInputStream(picture))
+                    val vo = PixivWork()
+                    vo.width = read.width
+                    vo.height = read.height
+                    vo
+                }
+
 
                 val picture = Picture(
                         fileName,
@@ -208,7 +222,9 @@ class CollectController(
                     userInfoService.get(pixivUser.userId)
                 } catch (e: NotFoundException) {
                     val info = initUser(pixivWork.userName)
-                    pixivUserService.save(info.id!!, pixivWork.userId!!)
+                    if (pixivWork.userId != null) {
+                        pixivUserService.save(info.id!!, pixivWork.userId!!)
+                    }
                     info
                 }
                 picture.createdBy = info.id!!
@@ -232,5 +248,27 @@ class CollectController(
         val info = UserInfo(gender = gender, nickname = nickname ?: "镜花水月", introduction = nickname ?: "镜花水月")
         info.userId = user.id!!
         return userInfoService.save(info)
+    }
+
+    private fun readTxt(txtPath: String): String? {
+        val file = File(txtPath)
+        return if (file.isFile && file.exists()) {
+            try {
+                val fileInputStream = FileInputStream(file)
+                val inputStreamReader = InputStreamReader(fileInputStream)
+                val bufferedReader = BufferedReader(inputStreamReader)
+                val sb = StringBuffer()
+                var text: String?
+                while (bufferedReader.readLine().also { text = it } != null) {
+                    sb.append(text)
+                }
+                sb.toString()
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+                throw e
+            }
+        } else {
+            null
+        }
     }
 }

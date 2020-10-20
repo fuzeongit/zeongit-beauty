@@ -62,8 +62,8 @@ class Picture() : AskEntity(), Serializable {
 
     constructor(url: String, width: Long, height: Long, name: String?, introduction: String?, privacy: PrivacyState = PrivacyState.PUBLIC) : this() {
         this.url = url
-        this.name = name ?: "无题"
-        this.introduction = introduction ?: "这是一张我从p站下载的图片，很好看啊，真的很好看啊，所以把他放在自己的网站上，侵删"
+        this.name = name ?: "镜花水月"
+        this.introduction = introduction ?: "镜花水月"
         this.width = width
         this.height = height
         this.privacy = privacy
