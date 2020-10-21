@@ -18,6 +18,8 @@ class PixivWorkDetail() : BaseEntity(), Serializable {
     var xRestrict = 0
     var pixivRestrict = 0
     var download: Boolean = false
+
+    @Column(name = "pixiv_using")
     var using: Boolean = false
 
     constructor(
