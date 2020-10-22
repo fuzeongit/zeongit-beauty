@@ -1,5 +1,6 @@
 package com.zeongit.admin.controller
 
+import com.qiniu.storage.model.FileInfo
 import com.zeongit.admin.dto.CollectDto
 import com.zeongit.admin.dto.UpdateOriginalUrlDto
 import com.zeongit.admin.service.*
@@ -9,6 +10,8 @@ import com.zeongit.data.database.admin.entity.PixivWork
 import com.zeongit.data.database.admin.entity.PixivWorkDetail
 import com.zeongit.data.database.primary.entity.Picture
 import com.zeongit.data.database.primary.entity.Tag
+import com.zeongit.qiniu.core.component.QiniuConfig
+import com.zeongit.qiniu.service.BucketService
 import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.database.account.entity.UserInfo
 import com.zeongit.share.enum.Gender
@@ -18,10 +21,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
+import java.io.*
 import java.util.*
 import javax.imageio.ImageIO
 
@@ -39,7 +39,9 @@ class CollectController(
         private val pixivUserService: PixivUserService,
         private val pixivWorkService: PixivWorkService,
         private val pixivWorkDetailService: PixivWorkDetailService,
-        private val collectErrorService: CollectErrorService
+        private val collectErrorService: CollectErrorService,
+        private val bucketService: BucketService,
+        private val qiniuConfig: QiniuConfig
 ) {
     @GetMapping("test")
     @RestfulPack
@@ -181,8 +183,23 @@ class CollectController(
      */
     @PostMapping("checkUse")
     @RestfulPack
-    fun checkUse(folderPath: String, userId: Int, privacy: PrivacyState): Boolean {
-        val fileNameList = File(folderPath).list() ?: arrayOf()
+    fun checkUse(folderPath: String, userId: Int, privacy: PrivacyState, txtPath: String): Boolean {
+//        var marker  = ""
+//        val list = mutableListOf<FileInfo>()
+//        do {
+//            val listing = bucketService.listFile(qiniuConfig.qiniuPictureBucket, marker)
+//            list.addAll(listing?.items ?: arrayOf<FileInfo>())
+//            if (listing == null || listing.marker.isNullOrBlank()) {
+//                break
+//            }
+//            marker = listing.marker
+//        } while (true)
+//        println(list.size)
+//        list.joinToString("|") { it.key }
+//        writeTxt("D:\\my\\index.txt",list.joinToString("|") { it.key })
+
+        val fileNameList = readTxt(txtPath)?.split("|") ?: listOf()
+//        val fileNameList = File(folderPath).list() ?: arrayOf()
         for (fileName in fileNameList) {
             try {
                 val pixivWorkDetail = try {
@@ -215,7 +232,7 @@ class CollectController(
 
                 val translateTags = pixivWork.translateTags ?: ""
                 if (translateTags.isNotBlank()) {
-                    picture.tagList.addAll(translateTags.split("|").asSequence().toSet().asSequence().map { Tag(it) }.toList())
+                    picture.tagList = translateTags.split("|").toSet().asSequence().map { Tag(it) }.toMutableSet()
                 }
                 val info = try {
                     val pixivUser = pixivUserService.getByPixivUserId(pixivWork.userId!!)
@@ -232,7 +249,7 @@ class CollectController(
                 pictureService.save(picture, true)
             } catch (e: Exception) {
                 println(fileName)
-                println(e)
+                println(e.message)
             }
         }
         return true
@@ -248,6 +265,24 @@ class CollectController(
         val info = UserInfo(gender = gender, nickname = nickname ?: "镜花水月", introduction = nickname ?: "镜花水月")
         info.userId = user.id!!
         return userInfoService.save(info)
+
+    }
+
+    private fun writeTxt(txtPath: String, content: String) {
+        val fileOutputStream: FileOutputStream
+        val file = File(txtPath)
+        try {
+            if (file.exists()) {
+                //判断文件是否存在，如果不存在就新建一个txt
+                file.createNewFile()
+            }
+            fileOutputStream = FileOutputStream(file)
+            fileOutputStream.write(content.toByteArray())
+            fileOutputStream.flush()
+            fileOutputStream.close()
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun readTxt(txtPath: String): String? {

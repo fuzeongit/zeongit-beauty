@@ -20,12 +20,12 @@ class QiniuConfig {
     //临时储存空间
     lateinit var qiniuTemporaryBucket: String
 
-    //头像储存空间
+    //图片储存空间
     lateinit var qiniuPictureBucket: String
 
     //临时储存空间
     lateinit var qiniuTemporaryBucketUrl: String
 
-    //头像储存空间
+    //图片储存空间
     lateinit var qiniuPictureBucketUrl: String
 }
