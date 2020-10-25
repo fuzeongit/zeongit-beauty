@@ -260,6 +260,14 @@ class CollectController(
         return true
     }
 
+    @GetMapping("toTxt")
+    @RestfulPack
+    fun toTxt() {
+        writeTxt("D:\\my\\图片\\p\\download.txt",
+                pixivWorkDetailService.listByDownload(true).joinToString("\r\n") { it.proxyUrl })
+    }
+
+
     private fun initUser(nickname: String?): UserInfo {
         var phone = Random().nextInt(10)
         while (userService.existsByPhone(phone.toString())) {
