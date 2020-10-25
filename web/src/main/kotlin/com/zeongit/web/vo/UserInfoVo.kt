@@ -23,7 +23,7 @@ class UserInfoVo(info: UserInfo) {
 
     var focus: FollowState = FollowState.STRANGE
 
-    var country: String = "中国"
+    var country: String? = "中国"
 
     var province: String? = null
 
