@@ -37,4 +37,6 @@ interface PictureDao : JpaRepository<Picture, Int>, JpaSpecificationExecutor<Pic
     fun findAllByCreatedBy(createdBy: Int): List<Picture>
 
     fun findAllByCreatedByAndLife(createdBy: Int, life: PictureLifeState): List<Picture>
+
+    fun findByUrl(url: String): Optional<Picture>
 }

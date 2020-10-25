@@ -16,6 +16,7 @@ import com.zeongit.share.annotations.RestfulPack
 import com.zeongit.share.database.account.entity.UserInfo
 import com.zeongit.share.enum.Gender
 import com.zeongit.share.exception.NotFoundException
+import com.zeongit.share.exception.ProgramException
 import com.zeongit.share.util.EmojiUtil
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -56,7 +57,7 @@ class CollectController(
                     val suitUrl = originalUrl.replace(pictureName, suitPictureName)
                     pixivWorkDetailService.save(PixivWorkDetail(
                             work.pixivId!!,
-                            pictureName,
+                            suitPictureName,
                             suitUrl,
                             suitUrl.replace("https://i.pximg.net/",
                                     "https://pixiv.zeongit.workers.dev/"),
@@ -132,7 +133,7 @@ class CollectController(
                     val suitUrl = originalUrl.replace(pictureName, suitPictureName)
                     pixivWorkDetailService.save(PixivWorkDetail(
                             work.pixivId!!,
-                            pictureName,
+                            suitPictureName,
                             suitUrl,
                             suitUrl.replace("https://i.pximg.net/",
                                     "https://pixiv.zeongit.workers.dev/"),
@@ -183,38 +184,28 @@ class CollectController(
      */
     @PostMapping("checkUse")
     @RestfulPack
-    fun checkUse(folderPath: String, userId: Int, privacy: PrivacyState, txtPath: String): Boolean {
-//        var marker  = ""
-//        val list = mutableListOf<FileInfo>()
-//        do {
-//            val listing = bucketService.listFile(qiniuConfig.qiniuPictureBucket, marker)
-//            list.addAll(listing?.items ?: arrayOf<FileInfo>())
-//            if (listing == null || listing.marker.isNullOrBlank()) {
-//                break
-//            }
-//            marker = listing.marker
-//        } while (true)
-//        println(list.size)
-//        list.joinToString("|") { it.key }
-//        writeTxt("D:\\my\\index.txt",list.joinToString("|") { it.key })
-
-        val fileNameList = readTxt(txtPath)?.split("|") ?: listOf()
-//        val fileNameList = File(folderPath).list() ?: arrayOf()
+    fun checkUse(folderPath: String, userId: Int, privacy: PrivacyState): Boolean {
+        val fileNameList = File(folderPath).list() ?: arrayOf()
+        println(fileNameList.size)
         for (fileName in fileNameList) {
             try {
                 val pixivWorkDetail = try {
-                    pixivWorkDetailService.getByName(fileName)
-                } catch (e: NotFoundException) {
-                    PixivWorkDetail(fileName.split("_").first(), fileName, "hide", "hide", 0, 0)
+                    val pixivWorkDetail = try {
+                        pixivWorkDetailService.getByName(fileName)
+                    } catch (e: NotFoundException) {
+                        PixivWorkDetail(fileName.split("_").first(), fileName, "hide", "hide", 0, 0)
+                    }
+                    pixivWorkDetail.using = true
+                    pixivWorkDetailService.save(pixivWorkDetail)
+                    pixivWorkDetail
+                } catch (e: Exception) {
+                    throw ProgramException("$fileName---------上半部错误")
                 }
-                pixivWorkDetail.using = true
-                pixivWorkDetailService.save(pixivWorkDetail)
 
                 val pixivWork = try {
                     pixivWorkService.getByPixivId(pixivWorkDetail.pixivId!!)
                 } catch (e: NotFoundException) {
-                    val picture = File("$folderPath/$fileName")
-                    val read = ImageIO.read(FileInputStream(picture))
+                    val read = ImageIO.read(FileInputStream(File("$folderPath/$fileName")))
                     val vo = PixivWork()
                     vo.width = read.width
                     vo.height = read.height
@@ -222,21 +213,26 @@ class CollectController(
                 }
 
 
-                val picture = Picture(
-                        fileName,
-                        pixivWork.width.toLong(),
-                        pixivWork.height.toLong(),
-                        pixivWork.title,
-                        pixivWork.description,
-                        privacy)
-
-                val translateTags = pixivWork.translateTags ?: ""
-                if (translateTags.isNotBlank()) {
-                    picture.tagList = translateTags.split("|").toSet().asSequence().map { Tag(it) }.toMutableSet()
+                val picture = try {
+                    pictureService.getByUrl(fileName)
+                } catch (e: NotFoundException) {
+                    Picture(
+                            fileName,
+                            pixivWork.width.toLong(),
+                            pixivWork.height.toLong(),
+                            pixivWork.title,
+                            pixivWork.description,
+                            privacy)
                 }
+
+
                 val info = try {
-                    val pixivUser = pixivUserService.getByPixivUserId(pixivWork.userId!!)
-                    userInfoService.get(pixivUser.userId)
+                    if (pixivWork.userId == null) {
+                        userInfoService.get(userId)
+                    } else {
+                        val pixivUser = pixivUserService.getByPixivUserId(pixivWork.userId!!)
+                        userInfoService.get(pixivUser.userId)
+                    }
                 } catch (e: NotFoundException) {
                     val info = initUser(pixivWork.userName)
                     if (pixivWork.userId != null) {
@@ -246,6 +242,15 @@ class CollectController(
                 }
                 picture.createdBy = info.id!!
                 picture.lastModifiedBy = info.id!!
+                val translateTags = pixivWork.translateTags ?: ""
+                if (translateTags.isNotBlank()) {
+                    picture.tagList = translateTags.split("|").toSet().asSequence().map {
+                        val tag = Tag(it)
+                        tag.createdBy = info.id!!
+                        tag.lastModifiedBy = info.id!!
+                        tag
+                    }.toMutableSet()
+                }
                 pictureService.save(picture, true)
             } catch (e: Exception) {
                 println(fileName)

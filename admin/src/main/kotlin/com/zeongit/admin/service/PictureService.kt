@@ -15,9 +15,11 @@ import java.util.*
  * @author fjj
  */
 interface PictureService {
-    fun paging(pageable: Pageable, userId: Int?, name: String?, privacy: PrivacyState?, life: PictureLifeState?, master: Boolean?, startDate: Date?, endDate: Date?,  aspectRatio: AspectRatio?): Page<Picture>
+    fun paging(pageable: Pageable, userId: Int?, name: String?, privacy: PrivacyState?, life: PictureLifeState?, master: Boolean?, startDate: Date?, endDate: Date?, aspectRatio: AspectRatio?): Page<Picture>
 
     fun get(id: Int): Picture
+
+    fun getByUrl(url: String): Picture
 
     fun getByLife(id: Int, life: PictureLifeState? = null): Picture
 
@@ -43,6 +45,7 @@ interface PictureService {
     fun listByUserId(userId: Int): List<Picture>
 
     fun listByUserIdAndLife(userId: Int, life: PictureLifeState?): List<Picture>
+
     /**
      * @param force 是否强制更新
      */

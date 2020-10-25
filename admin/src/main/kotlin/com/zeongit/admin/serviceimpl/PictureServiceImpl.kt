@@ -69,6 +69,10 @@ class PictureServiceImpl(private val pictureDao: PictureDao,
         return getByLife(id, PictureLifeState.EXIST)
     }
 
+    override fun getByUrl(url: String): Picture {
+        return pictureDao.findByUrl(url).orElseThrow { NotFoundException("图片不存在") }
+    }
+
     override fun getByLife(id: Int, life: PictureLifeState?): Picture {
         if (life != null) {
             return pictureDao.findByIdAndLife(id, life).orElseThrow { NotFoundException("图片不存在") }
@@ -119,6 +123,7 @@ class PictureServiceImpl(private val pictureDao: PictureDao,
         }
         return pictureDao.findAllByCreatedBy(userId)
     }
+
 
     override fun save(picture: Picture, force: Boolean): PictureDocument {
         if (picture.life == PictureLifeState.DISAPPEAR && !force) {
