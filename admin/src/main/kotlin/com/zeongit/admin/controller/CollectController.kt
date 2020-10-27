@@ -264,7 +264,7 @@ class CollectController(
     @RestfulPack
     fun toTxt() {
         writeTxt("D:\\my\\图片\\p\\download.txt",
-                pixivWorkDetailService.listByDownload(true).joinToString("\r\n") { it.proxyUrl })
+                pixivWorkDetailService.listByDownload(false).joinToString("\r\n") { it.proxyUrl })
     }
 
 
