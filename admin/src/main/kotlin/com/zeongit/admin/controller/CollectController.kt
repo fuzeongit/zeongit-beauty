@@ -23,6 +23,8 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
 import java.io.*
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.*
 import javax.imageio.ImageIO
 
@@ -70,6 +72,10 @@ class CollectController(
         return true
     }
 
+
+    /**
+     * 采集器采集到数据库
+     */
     @PostMapping("insert")
     @RestfulPack
     fun insert(@RequestBody collectDto: CollectDto): Boolean {
@@ -109,12 +115,18 @@ class CollectController(
         return true
     }
 
+    /**
+     * 获取采集任务
+     */
     @GetMapping("pagingOriginalUrlTask")
     @RestfulPack
     fun pagingOriginalUrlTask(@PageableDefault(value = 20) pageable: Pageable): Page<PixivWork> {
         return pixivWorkService.paging(pageable)
     }
 
+    /**
+     * 更新原始数据
+     */
     @PostMapping("updateOriginalUrl")
     @RestfulPack
     fun updateOriginalUrl(@RequestBody dto: UpdateOriginalUrlDto): Boolean {
@@ -263,10 +275,11 @@ class CollectController(
     @GetMapping("toTxt")
     @RestfulPack
     fun toTxt() {
-        writeTxt("D:\\my\\图片\\p\\download.txt",
+        writeTxt("D:\\my\\图片\\p\\download_proxy.txt",
                 pixivWorkDetailService.listByDownload(false).joinToString("\r\n") { it.proxyUrl })
+        writeTxt("D:\\my\\图片\\p\\download.txt",
+                pixivWorkDetailService.listByDownload(false).joinToString("\r\n") { it.url })
     }
-
 
     private fun initUser(nickname: String?): UserInfo {
         var phone = Random().nextInt(10)
