@@ -1,6 +1,7 @@
 package com.zeongit.admin.controller
 
 import com.zeongit.admin.service.PictureService
+import com.zeongit.admin.service.PixivWorkDetailService
 import com.zeongit.data.constant.AspectRatio
 import com.zeongit.data.constant.PictureLifeState
 import com.zeongit.data.constant.PrivacyState
@@ -21,6 +22,7 @@ class PictureController(
         private val bucketService: BucketService,
         private val qiniuConfig: QiniuConfig,
         private val pictureService: PictureService,
+        private val pixivWorkDetailService: PixivWorkDetailService,
         private val elasticsearchTemplate: ElasticsearchTemplate) {
 
     class IdListDto(var idList: List<Int>)
@@ -107,6 +109,28 @@ class PictureController(
     fun importES(): Long {
         return pictureService.synchronizationIndexPicture()
     }
+
+    /**
+     * 初始化进ES
+     */
+    @PostMapping("checkSize")
+    @RestfulPack
+    fun checkSize(): Boolean {
+        for (picture in pictureService.list()) {
+            val pixiv = pixivWorkDetailService.getByName(picture.url)
+            picture.height = pixiv.height.toLong()
+            picture.width = pixiv.width.toLong()
+
+            picture.aspectRatio = when {
+                picture.width > picture.height -> AspectRatio.HORIZONTAL
+                picture.width < picture.height -> AspectRatio.VERTICAL
+                else -> AspectRatio.SQUARE
+            }
+            pictureService.save(picture)
+        }
+        return true
+    }
+
 
 //    /**
 //     * 获取套图

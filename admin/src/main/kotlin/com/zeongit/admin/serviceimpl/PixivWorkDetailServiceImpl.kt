@@ -28,6 +28,14 @@ class PixivWorkDetailServiceImpl(private val pixivWorkDetailDao: PixivWorkDetail
         return pixivWorkDetailDao.findAllByDownload(download)
     }
 
+    override fun list(): List<PixivWorkDetail> {
+        return pixivWorkDetailDao.findAll()
+    }
+
+    override fun listByWidth(width:Int): List<PixivWorkDetail> {
+        return pixivWorkDetailDao.findAllByWidth(width)
+    }
+
     override fun saveAll(pixivWorkDetailList: List<PixivWorkDetail>): List<PixivWorkDetail> {
         return pixivWorkDetailDao.saveAll(pixivWorkDetailList)
     }

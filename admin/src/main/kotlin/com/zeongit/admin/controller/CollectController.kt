@@ -181,10 +181,19 @@ class CollectController(
             pixivWorkService.save(pixivWork)
         }
 
-        val pixivWorkDetailList = pixivWorkDetailService.listByDownload(false)
+//        val pixivWorkDetailList = pixivWorkDetailService.listByDownload(false)
+        val pixivWorkDetailList = pixivWorkDetailService.listByWidth(0)
 
         for (pixivWorkDetail in pixivWorkDetailList) {
+
             pixivWorkDetail.download = fileNameList.toList().contains(pixivWorkDetail.name)
+            try {
+                if(pixivWorkDetail.download){
+                    val read = ImageIO.read(FileInputStream(File("$folderPath/${pixivWorkDetail.name}")))
+                    pixivWorkDetail.width = read.width
+                    pixivWorkDetail.height = read.height
+                }
+            }catch (e:Exception){}
             pixivWorkDetailService.save(pixivWorkDetail)
         }
         return true
@@ -230,8 +239,8 @@ class CollectController(
                 } catch (e: NotFoundException) {
                     Picture(
                             fileName,
-                            pixivWork.width.toLong(),
-                            pixivWork.height.toLong(),
+                            pixivWorkDetail.width.toLong(),
+                            pixivWorkDetail.height.toLong(),
                             pixivWork.title,
                             pixivWork.description,
                             privacy)
@@ -270,6 +279,25 @@ class CollectController(
             }
         }
         return true
+    }
+
+    @PostMapping("checkRestrict")
+    @RestfulPack
+    fun checkRestrict(sourcePath: String, folderPath: String): List<String> {
+        val sourcePathList = File(sourcePath).list() ?: arrayOf()
+        val list = mutableListOf<String>()
+        for (path in sourcePathList) {
+            val detail =try {
+                pixivWorkDetailService.getByName(path)
+            } catch (e: NotFoundException) {
+                list.add(path)
+                continue
+            }
+            if (detail.xRestrict == 1) {
+                Files.move(Paths.get("$sourcePath/$path"), Paths.get("$folderPath/$path"))
+            }
+        }
+        return list
     }
 
     @GetMapping("toTxt")

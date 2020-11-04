@@ -12,4 +12,6 @@ interface PixivWorkDetailDao : JpaRepository<PixivWorkDetail, Int> {
     fun findAllByDownload(download: Boolean): List<PixivWorkDetail>
 
     fun findAllByPixivId(pixivId: String): List<PixivWorkDetail>
+
+    fun findAllByWidth(width: Int): List<PixivWorkDetail>
 }

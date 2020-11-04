@@ -12,6 +12,10 @@ interface PixivWorkDetailService {
 
     fun listByDownload(download: Boolean): List<PixivWorkDetail>
 
+    fun list(): List<PixivWorkDetail>
+
+    fun listByWidth(width: Int): List<PixivWorkDetail>
+
     fun saveAll(pixivWorkDetailList: List<PixivWorkDetail>): List<PixivWorkDetail>
 
 }
