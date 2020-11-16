@@ -1,6 +1,5 @@
 package com.zeongit.admin.controller
 
-import com.qiniu.storage.model.FileInfo
 import com.zeongit.admin.dto.CollectDto
 import com.zeongit.admin.dto.UpdateOriginalUrlDto
 import com.zeongit.admin.service.*
@@ -46,33 +45,6 @@ class CollectController(
         private val bucketService: BucketService,
         private val qiniuConfig: QiniuConfig
 ) {
-    @GetMapping("test")
-    @RestfulPack
-    fun test(): Boolean {
-        val list = pixivWorkService.list()
-        for (work in list) {
-            val originalUrl = work.originalUrl
-            if (originalUrl != null && originalUrl.startsWith("https://i.pximg.net/")) {
-                for (i in 0 until work.pageCount) {
-                    val pictureName = originalUrl.split("/").last()
-                    val suitPictureName = pictureName.replace("p0", "p$i")
-                    val suitUrl = originalUrl.replace(pictureName, suitPictureName)
-                    pixivWorkDetailService.save(PixivWorkDetail(
-                            work.pixivId!!,
-                            suitPictureName,
-                            suitUrl,
-                            suitUrl.replace("https://i.pximg.net/",
-                                    "https://pixiv.zeongit.workers.dev/"),
-                            work.xRestrict,
-                            work.pixivRestrict
-                    ))
-                }
-            }
-        }
-        return true
-    }
-
-
     /**
      * 采集器采集到数据库
      */
@@ -180,21 +152,19 @@ class CollectController(
             pixivWork.download = fileNameList.toList().filter { it.toLowerCase().startsWith(pixivWork.pixivId!!) }.size == pixivWork.pageCount
             pixivWorkService.save(pixivWork)
         }
-
-//        val pixivWorkDetailList = pixivWorkDetailService.listByDownload(false)
-        val pixivWorkDetailList = pixivWorkDetailService.listByWidth(0)
+        val pixivWorkDetailList = pixivWorkDetailService.listByDownload(false)
+//        val pixivWorkDetailList = pixivWorkDetailService.listByWidth(0)
 
         for (pixivWorkDetail in pixivWorkDetailList) {
-
             pixivWorkDetail.download = fileNameList.toList().contains(pixivWorkDetail.name)
             try {
                 if(pixivWorkDetail.download){
                     val read = ImageIO.read(FileInputStream(File("$folderPath/${pixivWorkDetail.name}")))
                     pixivWorkDetail.width = read.width
                     pixivWorkDetail.height = read.height
+                    pixivWorkDetailService.save(pixivWorkDetail)
                 }
             }catch (e:Exception){}
-            pixivWorkDetailService.save(pixivWorkDetail)
         }
         return true
     }
@@ -210,6 +180,7 @@ class CollectController(
         println(fileNameList.size)
         for (fileName in fileNameList) {
             try {
+                //获取pixiv图片详情
                 val pixivWorkDetail = try {
                     val pixivWorkDetail = try {
                         pixivWorkDetailService.getByName(fileName)
@@ -222,7 +193,7 @@ class CollectController(
                 } catch (e: Exception) {
                     throw ProgramException("$fileName---------上半部错误")
                 }
-
+                //现在数据库获取图片信息，如果没有直接读取图片信息
                 val pixivWork = try {
                     pixivWorkService.getByPixivId(pixivWorkDetail.pixivId!!)
                 } catch (e: NotFoundException) {
@@ -233,7 +204,7 @@ class CollectController(
                     vo
                 }
 
-
+                //根据url获取正式数据库图片信息
                 val picture = try {
                     pictureService.getByUrl(fileName)
                 } catch (e: NotFoundException) {
@@ -245,8 +216,7 @@ class CollectController(
                             pixivWork.description,
                             privacy)
                 }
-
-
+                //获取pixiv用户信息
                 val info = try {
                     if (pixivWork.userId == null) {
                         userInfoService.get(userId)
@@ -255,6 +225,7 @@ class CollectController(
                         userInfoService.get(pixivUser.userId)
                     }
                 } catch (e: NotFoundException) {
+                    //都失败创建一个用户
                     val info = initUser(pixivWork.userName)
                     if (pixivWork.userId != null) {
                         pixivUserService.save(info.id!!, pixivWork.userId!!)
