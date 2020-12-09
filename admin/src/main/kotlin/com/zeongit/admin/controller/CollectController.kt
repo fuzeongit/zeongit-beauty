@@ -42,6 +42,7 @@ class CollectController(
         private val pixivWorkService: PixivWorkService,
         private val pixivWorkDetailService: PixivWorkDetailService,
         private val collectErrorService: CollectErrorService,
+        private val nsfwLevelService: NsfwLevelService,
         private val bucketService: BucketService,
         private val qiniuConfig: QiniuConfig
 ) {
@@ -158,13 +159,14 @@ class CollectController(
         for (pixivWorkDetail in pixivWorkDetailList) {
             pixivWorkDetail.download = fileNameList.toList().contains(pixivWorkDetail.name)
             try {
-                if(pixivWorkDetail.download){
+                if (pixivWorkDetail.download) {
                     val read = ImageIO.read(FileInputStream(File("$folderPath/${pixivWorkDetail.name}")))
                     pixivWorkDetail.width = read.width
                     pixivWorkDetail.height = read.height
                     pixivWorkDetailService.save(pixivWorkDetail)
                 }
-            }catch (e:Exception){}
+            } catch (e: Exception) {
+            }
         }
         return true
     }
@@ -258,7 +260,7 @@ class CollectController(
         val sourcePathList = File(sourcePath).list() ?: arrayOf()
         val list = mutableListOf<String>()
         for (path in sourcePathList) {
-            val detail =try {
+            val detail = try {
                 pixivWorkDetailService.getByName(path)
             } catch (e: NotFoundException) {
                 list.add(path)
@@ -278,6 +280,39 @@ class CollectController(
                 pixivWorkDetailService.listByDownload(false).joinToString("\r\n") { it.proxyUrl })
         writeTxt("D:\\my\\图片\\p\\download.txt",
                 pixivWorkDetailService.listByDownload(false).joinToString("\r\n") { it.url })
+    }
+
+    @PostMapping("toTxtAgain")
+    @RestfulPack
+    fun toTxtAgain(sourcePath: String) {
+        val sourcePathList = File(sourcePath).list() ?: arrayOf()
+        val list = mutableListOf<PixivWorkDetail>()
+        for (path in sourcePathList) {
+            try {
+                list.add(pixivWorkDetailService.getByName(path))
+            } catch (e: NotFoundException) {
+                continue
+            }
+        }
+        writeTxt("D:\\my\\图片\\p\\download_proxy.txt",
+                list.joinToString("\r\n") { it.proxyUrl })
+        writeTxt("D:\\my\\图片\\p\\download.txt",
+                list.joinToString("\r\n") { it.url })
+    }
+
+    @PostMapping("move")
+    @RestfulPack
+    fun move(sourcePath: String, folderPath: String): Boolean {
+        val list = nsfwLevelService.list()
+
+        for (nsfwLevel in list) {
+            try {
+                Files.move(Paths.get("$sourcePath/${nsfwLevel.url}"), Paths.get("$folderPath/${nsfwLevel.classify}/${nsfwLevel.url}"))
+            } catch (e: Exception) {
+                print(e)
+            }
+        }
+        return true
     }
 
     private fun initUser(nickname: String?): UserInfo {
