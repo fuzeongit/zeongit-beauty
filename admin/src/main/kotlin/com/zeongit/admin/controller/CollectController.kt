@@ -3,6 +3,7 @@ package com.zeongit.admin.controller
 import com.zeongit.admin.dto.CollectDto
 import com.zeongit.admin.dto.UpdateOriginalUrlDto
 import com.zeongit.admin.service.*
+import com.zeongit.data.constant.AspectRatio
 import com.zeongit.data.constant.PrivacyState
 import com.zeongit.data.database.admin.entity.CollectError
 import com.zeongit.data.database.admin.entity.PixivWork
@@ -273,6 +274,9 @@ class CollectController(
         return list
     }
 
+    /**
+     * 将未下载的输出txt
+     */
     @GetMapping("toTxt")
     @RestfulPack
     fun toTxt() {
@@ -282,6 +286,9 @@ class CollectController(
                 pixivWorkDetailService.listByDownload(false).joinToString("\r\n") { it.url })
     }
 
+    /**
+     * 破图再次输出下载txt
+     */
     @PostMapping("toTxtAgain")
     @RestfulPack
     fun toTxtAgain(sourcePath: String) {
@@ -298,6 +305,35 @@ class CollectController(
                 list.joinToString("\r\n") { it.proxyUrl })
         writeTxt("D:\\my\\图片\\p\\download.txt",
                 list.joinToString("\r\n") { it.url })
+    }
+
+    @PostMapping("checkErrorPicture")
+    @RestfulPack
+    fun checkErrorPicture(folderPath: String) {
+        val pictureList = pictureService.list()
+        for (picture in pictureList) {
+            if (picture.width == 0L || picture.height == 0L) {
+                try {
+                    val read = ImageIO.read(FileInputStream(File("$folderPath/${picture.url}")))
+                    val pixivworkDetail = pixivWorkDetailService.getByName(picture.url)
+                    pixivworkDetail.height = read.height
+                    pixivworkDetail.width = read.width
+                    picture.height = read.height.toLong()
+                    picture.width = read.width.toLong()
+                    picture.aspectRatio = when {
+                        picture.width > picture.height -> AspectRatio.HORIZONTAL
+                        picture.width < picture.height -> AspectRatio.VERTICAL
+                        else -> AspectRatio.SQUARE
+                    }
+                    pixivWorkDetailService.save(pixivworkDetail)
+                    pictureService.save(picture)
+                } catch (e: Exception) {
+                    println(e.message)
+                    println(picture.id)
+                    println("--------------------------------")
+                }
+            }
+        }
     }
 
     @PostMapping("move")
